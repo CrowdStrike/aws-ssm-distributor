@@ -39,7 +39,7 @@ The distributor package uses AWS Systems Manager Parameter Store to store the AP
     | Default Parameter Name | Parameter Value | Parameter Type |
     | --- | --- | --- |
     | /CrowdStrike/Falcon/Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). | SecureString |
-    | /CrowdStrike/Falcon/ClientID | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
+    | /CrowdStrike/Falcon/ClientId | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
     | /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
     > **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the association in the next step.
 
@@ -56,13 +56,13 @@ Create the following parameters
 | Default Parameter Name | Parameter Value | Parameter Type |
 | --- | --- | --- |
 | /CrowdStrike/Falcon/Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). | SecureString |
-| /CrowdStrike/Falcon/ClientID | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
+| /CrowdStrike/Falcon/ClientId | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
 | /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
 > **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the association in the next step.
 
 ```bash
 aws ssm put-parameter \
-    --name "/CrowdStrike/Falcon/ClientID" \
+    --name "/CrowdStrike/Falcon/ClientId" \
     --type "SecureString" \
     --description "CrowdStrike Falcon API Client ID for the distributor package" \
     --region "us-east-1" \
@@ -129,7 +129,7 @@ The CrowdStrike sensor for windows and linux do not share the same release versi
     | PackageName | The Distributor package name. For Windows use FalconSensor-Windows, for Linux use FalconSensor-Linux. | **N/a** | Yes |
     | PackageVersion | The version of the package to install. | **N-2** | No |
     | FalconCloud | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/Cloud** | Yes |
-    | FalconClientID | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientID** | Yes |
+    | FalconClientId | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientId** | Yes |
     | FalconClientSecret | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientSecret** | Yes |
     | AutomationAssumeRole | The ARN of the role that the automation document will assume. | **N/a** | Yes |
     | Action | Whether to install or uninstall | **Install** | No |
