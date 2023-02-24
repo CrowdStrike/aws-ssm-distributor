@@ -18,6 +18,14 @@ The distributor package uses the CrowdStrike API to download the sensor onto the
 
 3. Click **Add** to create the API client. The next screen will display the API **CLIENT ID**, **SECRET**, and **BASE URL**. You will need all three for the next step.
 
+    <details><summary>picture</summary>
+    <p>
+
+    ![api-client-keys](./assets/api-client-keys.png)
+
+    </p>
+    </details>
+
 ## Create AWS Parameter Store Parameters
 
 The distributor package uses AWS Systems Manager Parameter Store to store the API keys. You can create the parameters in the AWS console or using the AWS CLI.
@@ -57,8 +65,8 @@ aws ssm put-parameter \
     --name "/CrowdStrike/Falcon/ClientID" \
     --type "SecureString" \
     --description "CrowdStrike Falcon API Client ID for the distributor package" \
-    --value "CLIENT_ID" \
-    --region "us-east-1"
+    --region "us-east-1" \
+    --value "CLIENT_ID"
 ```
 
 ```bash 
@@ -66,16 +74,16 @@ aws ssm put-parameter \
     --name "/CrowdStrike/Falcon/ClientSecret" \
     --type "SecureString" \
     --description "CrowdStrike Falcon API Secret for the distributor package" \
-    --value "SECRET" \
-    --region "us-east-1"
+    --region "us-east-1" \
+    --value "SECRET"
 ```
 ```bash
 aws ssm put-parameter \
     --name "/CrowdStrike/Falcon/Cloud" \
     --type "SecureString" \
     --description "CrowdStrike Falcon API Base URL for the distributor package" \
-    --value "BASE_URL" \
-    --region "us-east-1"
+    --region "us-east-1" 
+    --value "BASE_URL"
 ```
 
 </p>
@@ -167,7 +175,7 @@ How you target your hosts will depend on your environment and your needs, but si
 
 ### Using Resource Groups
 
-Resource Groups allow you to target specific AWS services based on tags. See the [Resource Groups documentation](https://docs.aws.amazon.com/ARG/latest/userguide/resource-groups.html) for more information.
+Resource Groups allow you to target specific AWS resources based on tags. See the [Resource Groups documentation](https://docs.aws.amazon.com/ARG/latest/userguide/resource-groups.html) for more information.
 
 In this example we are going to use two tags to target our hosts.
 
