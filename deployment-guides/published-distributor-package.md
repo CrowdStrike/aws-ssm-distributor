@@ -20,6 +20,11 @@ The distributor package uses the CrowdStrike API to download the sensor onto the
 
 ## Create AWS Parameter Store Parameters
 
+The distributor package uses AWS Systems Manager Parameter Store to store the API keys. You can create the parameters in the AWS console or using the AWS CLI.
+
+<details><summary>Using the AWS Console</summary>
+<p>
+
 1. In your AWS console, navigate to **AWS Systems Manager** > **Application Management** > **Parameter Store**.
 2. Create the following parameters
 
@@ -30,17 +35,86 @@ The distributor package uses the CrowdStrike API to download the sensor onto the
     | /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
     > **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the assocation in the next step.
 
+</p>
+</details>
+
+<details><summary>Using the AWS CLI</summary>
+<p>
+
+We can use the `aws ssm put-parameter` command to create the parameters from the CLI. See the [put-parameter documentation](https://docs.aws.amazon.com/cli/latest/reference/ssm/put-parameter.html) for more information.
+
+Create the following parameters
+
+| Default Parameter Name | Parameter Value | Parameter Type |
+| --- | --- | --- |
+| /CrowdStrike/Falcon/Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). | SecureString |
+| /CrowdStrike/Falcon/ClientID | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
+| /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
+> **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the assocation in the next step.
+
+```bash
+aws ssm put-parameter \
+    --name "/CrowdStrike/Falcon/ClientID" \
+    --type "SecureString" \
+    --description "CrowdStrike Falcon API Client ID for the distributor package" \
+    --value "CLIENT_ID" \
+    --region "us-east-1"
+```
+
+```bash 
+aws ssm put-parameter \
+    --name "/CrowdStrike/Falcon/ClientSecret" \
+    --type "SecureString" \
+    --description "CrowdStrike Falcon API Secret for the distributor package" \
+    --value "SECRET" \
+    --region "us-east-1"
+```
+```bash
+aws ssm put-parameter \
+    --name "/CrowdStrike/Falcon/Cloud" \
+    --type "SecureString" \
+    --description "CrowdStrike Falcon API Base URL for the distributor package" \
+    --value "BASE_URL" \
+    --region "us-east-1"
+```
+
+</p>
+</details>
+
 ## Create AWS Systems Manager Association
 
-The CrowdStrike sensor for windows and linux do not share the same release versions. Because of this there are two separate distributor packages. You will need to create an association for each operating system.
+The CrowdStrike sensor for windows and linux do not share the same release versions. Because of this there are two separate distributor packages. You will need to create an association for windows and an association for linux.
+
+<details><summary>Using the AWS Console</summary>
+<p>
 
 1. In the AWS console, go to **AWS Systems Manager** > **Node Management** > **Distributor** > **Third Party**.
 2. Select the package for the operating system you want to deploy.
-   ![distributor-package](./assets/distributor-third-party-tab.png)
+    <details><summary>picture</summary>
+    <p>
+
+    ![distributor-third-party-tab](./assets/distributor-third-party-tab.png)
+
+    </p>
+    </details>
 3. Under **Document** choose **Default at runtime** for **Document Version** (the default document version will always be the most stable)
 4. Under **Execution** choose **Rate Control** 
+    <details><summary>picture</summary>
+    <p>
+
+    ![execution-section](./assets/execution-section.png)
+
+    </p>
+    </details>
 5. Under **Targets**, choose the method you want to use to target hosts. For more information on targeting hosts, see [Targeting](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations-map-targets.html).
-    > **Note:** Whatever method you choose to target your systems with ensure that the targeted systems are running the correct operating system for the distributor package you are using. See [Example Targeting](#Example-Targeting) for an example of targeting systems based on tags and Resource Groups.
+    > **Note:** Whatever method you choose to target your systems with ensure that the targeted systems are running the correct operating system for the distributor package you are using. See [Example Targeting](#Example-Targeting) for an example of targeting systems based on Resource Groups.
+    <details><summary>picture</summary>
+    <p>
+
+    ![targets-section](./assets/targets-section.png)
+
+    </p>
+    </details>
 6. Fill in the required parameters. 
     | Parameter Name | Description | Default Value | Required |
     | --- | --- | --- | --- |
@@ -54,25 +128,98 @@ The CrowdStrike sensor for windows and linux do not share the same release versi
     | InstallationType | The installation type. | **Uninstall and reinstall** | No |
     | InstallerParams | The parameters to pass to the installer. | **N/a** | No |
 
+    <details><summary>picture</summary>
+    <p>
+
+    ![input-parameters-section](./assets/input-parameters-section.png)
+
+    </p>
+    </details>
 7. Click **Create Association**.
 
+</p>
+</details>
 
-You can also use the AWS CLI to create the state manager association. See the [AWS CLI documentation](https://docs.aws.amazon.com/cli/latest/reference/ssm/create-association.html) for more information.
+<details><summary>Using the AWS CLI</summary>
+<p>
+
+We can use the `aws ssm create-association` command to create the assocation from the CLI. See the [create-association documentation](https://docs.aws.amazon.com/cli/latest/reference/ssm/create-association.html) for more information.
 
 Here is an example of creating an association using the AWS CLI that targets a Resource Group named `crowdstrike-sensor-deploy-windows`.
 ```bash
 aws ssm create-association \
     --name "CrowdStrike-FalconSensorDeploy" \
-    --targets "Key=resource-groups:Name,Values=crowdstrike-sensor-deploy-windows" \
+    --targets "Key=resource-groups:Name,Values=ssm-crowdstrike-sensor-deploy-windows" \
     --parameters "PackageName=FalconSensor-Windows" \
     --association-name "CrowdStrike-FalconSensorDeploy-Windows" \
-```
+    --region "us-east-1"
+``` 
+
+</p>
+</details>
 
 ## Example Targeting
 
+AWS has a few ways for you to target hosts for an assocation. See the [Targeting documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations-map-targets.html) for more information.
+
+How you target your hosts will depend on your environment and your needs, but since our assosiations are OS specific you will want to make sure only Windows hosts are being targeted for your windows assocation and only Linux hosts are being targeted for your linux assocation.
 
 
+### Using Resource Groups
 
+Resource Groups allow you to target specific AWS services based on tags. See the [Resource Groups documentation](https://docs.aws.amazon.com/ARG/latest/userguide/resource-groups.html) for more information.
 
+In this example we are going to use two tags to target our hosts.
 
+| Tag Key | Tag Description | Tag Value |
+| --- | --- | --- |
+| cs-sensor-deploy | This tag will be used to target hosts that we want to deploy the sensor to. | true |
+| os | This tag will be used to target hosts based on their operating system. | windows or linux |
 
+> **Note:** These tags are just an example. You can use whatever tags you want to target your hosts.
+
+<details><summary>Using the AWS Console</summary>
+<p>
+
+1. In the AWS console, go to **Resource Groups** > **Resources** > **Create Resource Group**.
+2. Under **Group Type** choose **Tag-based**.
+3. Under **Grouping Criteria** > **Resource Type** choose **AWS::EC2::Instance**.
+5. Under **Grouping Criteria** add the tags you want to use to target your hosts.
+6. Under **Group Details** > Enter a **Group Name**. This will be the name of the Resource Group your assocation will target.
+7. Fill in any optional fields you want.
+
+    <details><summary>picture</summary>
+    <p>
+
+    ![create-resource-group](./assets/create-resource-group.png)
+
+    </p>
+    </details>
+</p>
+</details>
+
+<details><summary>Using the AWS CLI</summary>
+<p>
+
+We can use the `aws resource-groups create-group` command to create the Resource Group from the CLI. See the [create-group documentation](https://docs.aws.amazon.com/cli/latest/reference/resource-groups/create-group.html) for more information.
+
+Here is an example of creating a Resource Group using the AWS CLI that uses the tags we defined above.
+
+Creating a Resource Group for Windows hosts
+```bash
+aws resource-groups create-group \
+    --name "ssm-crowdstrike-sensor-deploy-windows" \
+    --resource-query '{"Type": "TAG_FILTERS_1_0", "Query": "{\"ResourceTypeFilters\": [\"AWS::EC2::Instance\"], \"TagFilters\": [{\"Key\": \"cs-sensor-deploy\", \"Values\": [\"true\"]}, {\"Key\": \"os\", \"Values\": [\"windows\"]}]}" }' \
+    --region "us-east-1"
+```
+
+Creating a Resource Group for Linux hosts
+```bash
+aws resource-groups create-group \
+    --name "ssm-crowdstrike-sensor-deploy-linux" \
+    --resource-query '{"Type": "TAG_FILTERS_1_0", "Query": "{\"ResourceTypeFilters\": [\"AWS::EC2::Instance\"], \"TagFilters\": [{\"Key\": \"cs-sensor-deploy\", \"Values\": [\"true\"]}, {\"Key\": \"os\", \"Values\": [\"linux\"]}]}" }' \
+    --region "us-east-1"
+```
+
+</p>
+</details>
