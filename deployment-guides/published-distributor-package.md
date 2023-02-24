@@ -14,7 +14,7 @@ The distributor package uses the CrowdStrike API to download the sensor onto the
     | Scope | Permission | Description |
     | --- | --- | --- |
     | Installation Tokens | *READ* | Allows the distributor to pull installation tokens from the CrowdStrike API. |
-    | Sensor Downloads | *READ* | Allows the distributor to download the sensor from the CrowdStrike API. |
+    | Sensor Download | *READ* | Allows the distributor to download the sensor from the CrowdStrike API. |
 
 3. Click **Add** to create the API client. The next screen will display the API **CLIENT ID**, **SECRET**, and **BASE URL**. You will need all three for the next step.
 
@@ -82,7 +82,7 @@ aws ssm put-parameter \
     --name "/CrowdStrike/Falcon/Cloud" \
     --type "SecureString" \
     --description "CrowdStrike Falcon API Base URL for the distributor package" \
-    --region "us-east-1" 
+    --region "us-east-1" \
     --value "BASE_URL"
 ```
 
@@ -158,7 +158,7 @@ Here is an example of creating an association using the AWS CLI that targets a R
 aws ssm create-association \
     --name "CrowdStrike-FalconSensorDeploy" \
     --targets "Key=resource-groups:Name,Values=ssm-crowdstrike-sensor-deploy-windows" \
-    --parameters "PackageName=FalconSensor-Windows" \
+    --parameters "PackageName=FalconSensor-Windows,AutomationAssumeRole=arn:aws:iam::1111111111:role/crowdstrike-ssm-assume-role" \
     --association-name "CrowdStrike-FalconSensorDeploy-Windows" \
     --region "us-east-1"
 ``` 
