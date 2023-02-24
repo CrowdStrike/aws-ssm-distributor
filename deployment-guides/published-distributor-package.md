@@ -1,4 +1,4 @@
-# Offical AWS Distributor Package
+# Official AWS Distributor Package
 
 This deployment guide outlines the steps required to use the published third party distributor package in AWS. This method prevents the need to build your own packages and publish your own SSM automation documents to AWS.
 
@@ -41,7 +41,7 @@ The distributor package uses AWS Systems Manager Parameter Store to store the AP
     | /CrowdStrike/Falcon/Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). | SecureString |
     | /CrowdStrike/Falcon/ClientID | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
     | /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
-    > **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the assocation in the next step.
+    > **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the association in the next step.
 
 </p>
 </details>
@@ -58,7 +58,7 @@ Create the following parameters
 | /CrowdStrike/Falcon/Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). | SecureString |
 | /CrowdStrike/Falcon/ClientID | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
 | /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
-> **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the assocation in the next step.
+> **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the association in the next step.
 
 ```bash
 aws ssm put-parameter \
@@ -151,7 +151,7 @@ The CrowdStrike sensor for windows and linux do not share the same release versi
 <details><summary>Using the AWS CLI</summary>
 <p>
 
-We can use the `aws ssm create-association` command to create the assocation from the CLI. See the [create-association documentation](https://docs.aws.amazon.com/cli/latest/reference/ssm/create-association.html) for more information.
+We can use the `aws ssm create-association` command to create the association from the CLI. See the [create-association documentation](https://docs.aws.amazon.com/cli/latest/reference/ssm/create-association.html) for more information.
 
 Here is an example of creating an association using the AWS CLI that targets a Resource Group named `crowdstrike-sensor-deploy-windows`.
 ```bash
@@ -168,9 +168,9 @@ aws ssm create-association \
 
 ## Example Targeting
 
-AWS has a few ways for you to target hosts for an assocation. See the [Targeting documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations-map-targets.html) for more information.
+AWS has a few ways for you to target hosts for an association. See the [Targeting documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations-map-targets.html) for more information.
 
-How you target your hosts will depend on your environment and your needs, but since our assosiations are OS specific you will want to make sure only Windows hosts are being targeted for your windows assocation and only Linux hosts are being targeted for your linux assocation.
+How you target your hosts will depend on your environment and your needs, but since our associations are OS specific you will want to make sure only Windows hosts are being targeted for your windows association and only Linux hosts are being targeted for your linux association.
 
 
 ### Using Resource Groups
@@ -193,7 +193,7 @@ In this example we are going to use two tags to target our hosts.
 2. Under **Group Type** choose **Tag-based**.
 3. Under **Grouping Criteria** > **Resource Type** choose **AWS::EC2::Instance**.
 5. Under **Grouping Criteria** add the tags you want to use to target your hosts.
-6. Under **Group Details** > Enter a **Group Name**. This will be the name of the Resource Group your assocation will target.
+6. Under **Group Details** > Enter a **Group Name**. This will be the name of the Resource Group your association will target.
 7. Fill in any optional fields you want.
 
     <details><summary>picture</summary>
