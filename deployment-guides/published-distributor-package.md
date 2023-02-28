@@ -114,7 +114,8 @@ The CrowdStrike sensor for windows and linux do not share the same release versi
 
     </p>
     </details>
-5. Under **Targets**, choose the method you want to use to target hosts. For more information on targeting hosts, see [Targeting](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations-map-targets.html).
+4. Under **Targets** > **Parameter** choose **InstanceIds**.
+6. Under **Targets** > **Targets** choose the method you want to use to target hosts. For more information on targeting hosts, see [Targeting](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations-map-targets.html).
     > **Note:** Whatever method you choose to target your systems with ensure that the targeted systems are running the correct operating system for the distributor package you are using. See [Example Targeting](#Example-Targeting) for an example of targeting systems based on Resource Groups.
     <details><summary>picture</summary>
     <p>
@@ -123,7 +124,7 @@ The CrowdStrike sensor for windows and linux do not share the same release versi
 
     </p>
     </details>
-6. Fill in the required parameters. 
+7. Fill in the required parameters. 
     | Parameter Name | Description | Default Value | Required |
     | --- | --- | --- | --- |
     | PackageName | The Distributor package name. For Windows use FalconSensor-Windows, for Linux use FalconSensor-Linux. | **N/a** | Yes |
@@ -143,7 +144,7 @@ The CrowdStrike sensor for windows and linux do not share the same release versi
 
     </p>
     </details>
-7. Click **Create Association**.
+8. Click **Create Association**.
 
 </p>
 </details>
@@ -157,9 +158,10 @@ Here is an example of creating an association using the AWS CLI that targets a R
 ```bash
 aws ssm create-association \
     --name "CrowdStrike-FalconSensorDeploy" \
-    --targets "Key=resource-groups:Name,Values=ssm-crowdstrike-sensor-deploy-windows" \
-    --parameters "PackageName=FalconSensor-Windows,AutomationAssumeRole=arn:aws:iam::1111111111:role/crowdstrike-ssm-assume-role" \
+    --targets "Key=ResourceGroup,Values=ssm-crowdstrike-sensor-deploy-windows" \
+    --parameters "PackageName=FalconSensor-Windows,AutomationAssumeRole=arn:aws:iam::111111111:role/crowdstrike-ssm-assume-role" \
     --association-name "CrowdStrike-FalconSensorDeploy-Windows" \
+    --automation-target-parameter-name "InstanceIds" \
     --region "us-east-1"
 ``` 
 
