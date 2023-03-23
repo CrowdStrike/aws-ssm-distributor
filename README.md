@@ -4,8 +4,6 @@ This repository contains the documentation and source code to deploy the CrowdSt
 
 ## Overview
 
-There are a few different ways to deploy the CrowdStrike Falcon Sensor using AWS Systems Manager. The following table outlines the different methods and their use cases.
-
-| Method | Description | Use Case | API Keys Required |
+| Integration | Description | Use Case | API Keys Required |
 | --- | --- | --- | --- |
-| [Offical AWS Distributor Package](./deployment-guides/published-distributor-package.md) | This method uses the published third party distributor package in AWS. | This method prevents the need to build your own packages and publish documents to AWS. | Yes |
+| [Offical AWS Distributor Package](./deployment-guides/published-distributor-package.md) | Install the falcon sensor on instances across your aws account using AWS SSM | Automatically install the sensor on windows and linux instances. | Yes |
