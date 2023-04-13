@@ -2,7 +2,7 @@
 
 This deployment guide outlines the steps required to use the published third party distributor package in AWS. This method prevents the need to build your own packages and publish your own SSM automation documents to AWS.
 
-New versions of the Falcon Distributor Package are published to the AWS every time a new version of the Falcon Sensor is released.
+New versions of the Falcon Distributor Package are published to AWS every time a new version of the Falcon Sensor is released.
 
 ## Generate API Keys
 
@@ -26,22 +26,26 @@ The distributor package uses the CrowdStrike API to download the sensor onto the
     </p>
     </details>
 
+> Note: This page is only shown once. Make sure you copy **CLIENT ID**, **SECRET**, and **BASE URL** to a secure location.
+
 ## Create AWS Parameter Store Parameters
 
 The distributor package uses AWS Systems Manager Parameter Store to store the API keys. You can create the parameters in the AWS console or using the AWS CLI.
+
+The following parameters must be created:
+
+| Default Parameter Name | Parameter Value | Parameter Type |
+| --- | --- | --- |
+| /CrowdStrike/Falcon/Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). | SecureString |
+| /CrowdStrike/Falcon/ClientId | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
+| /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
+> **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the association in the next step.
 
 <details><summary>Using the AWS Console</summary>
 <p>
 
 1. In your AWS console, navigate to **AWS Systems Manager** > **Application Management** > **Parameter Store**.
-2. Create the following parameters
-
-    | Default Parameter Name | Parameter Value | Parameter Type |
-    | --- | --- | --- |
-    | /CrowdStrike/Falcon/Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). | SecureString |
-    | /CrowdStrike/Falcon/ClientId | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
-    | /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
-    > **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the association in the next step.
+2. Create the parameters mentioned in the table above.
 
 </p>
 </details>
@@ -50,15 +54,6 @@ The distributor package uses AWS Systems Manager Parameter Store to store the AP
 <p>
 
 We can use the `aws ssm put-parameter` command to create the parameters from the CLI. See the [put-parameter documentation](https://docs.aws.amazon.com/cli/latest/reference/ssm/put-parameter.html) for more information.
-
-Create the following parameters
-
-| Default Parameter Name | Parameter Value | Parameter Type |
-| --- | --- | --- |
-| /CrowdStrike/Falcon/Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). | SecureString |
-| /CrowdStrike/Falcon/ClientId | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
-| /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
-> **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the association in the next step.
 
 ```bash
 aws ssm put-parameter \
@@ -91,9 +86,9 @@ aws ssm put-parameter \
 
 ## Create AWS Systems Manager Association
 
-Using state manager associations, we can create a single association that will install the sensor on all of our target instances. The association will use the AWS Systems Manager Distributor package to install the sensor. For more information on state manager, see the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-state-about.html).
+Using State Manager associations, we can create a single association that will install the sensor on all of our target instances. The association will use the AWS Systems Manager Distributor package to install the sensor. For more information on State Manager, see the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-state-about.html).
 
-> **Note:** There are two distributor packages available because the falcon sensor for windows and linux have a different version number. You will be able to target a specific version for each OS in the association parameters.
+> **Note:** There are two distributor packages available because the falcon sensor for Windows and Linux have a different version number. You will be able to target a specific version for each OS in the association parameters.
 
 <details><summary>Using the AWS Console</summary>
 <p>
@@ -129,8 +124,8 @@ Using state manager associations, we can create a single association that will i
     | Parameter Name | Description | Default Value | Required |
     | --- | --- | --- | --- |
     | AutomationAssumeRole | The ARN of the role that the automation document will assume. | **N/a** | Yes |
-    | LinuxPackageVersion | The linux version of the package to install. | **N-2** | No |
-    | WindowsPackageVersion | The windows version of the package to install. | **N-2** | No |
+    | LinuxPackageVersion | The Linux version of the package to install. | **N-2** | No |
+    | WindowsPackageVersion | The Windows version of the package to install. | **N-2** | No |
     | FalconCloud | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/Cloud** | Yes |
     | FalconClientId | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientId** | Yes |
     | FalconClientSecret | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientSecret** | Yes |
