@@ -84,6 +84,55 @@ aws ssm put-parameter \
 </p>
 </details>
 
+## Create AWS IAM Role
+
+The distributor package uses an AWS IAM role to assume when running the AWS Systems Manager Automation document. The role is used for the following:
+
+- Create/Read/Update AWS Systems Manager Parameter Store parameters
+- Describe AWS EC2 instances to determine the platform
+- Run the `AWS-COnfigureAWSPackage` document to install the sensor
+
+<details><summary>Using CloudFormation</summary>
+
+A CloudFormation template with the required permissions is available under the [cloudformation](./cloudformation) directory.
+
+You can use the below command to download the template and create the stack.
+
+```bash
+curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-systems-manager/main/distributor/official-package/cloudformation/iam-role.yaml" \
+&& aws cloudformation create-stack \
+  --stack-name crowdstrike-distributor-deploy-role \
+  --template-body file://iam-role.yaml \
+  --capabilities CAPABILITY_NAMED_IAM
+```
+</details>
+
+<details>> <summary>Using the AWS CLI</summary>
+
+We can use the `aws iam create-role` command to create the role from the CLI. See the [create-role documentation](https://docs.aws.amazon.com/cli/latest/reference/iam/create-role.html) for more information.
+
+```bash
+aws iam create-role \
+    --role-name "crowdstrike-distributor-deploy-role" \
+    --assume-role-policy-document '{
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "ssm.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+            }
+        ]
+    }' \
+    --description "Role for running SSM automation documents" \
+    --max-session-duration 3600 \
+    --permissions-boundary "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
+```
+</details>
+
+
 ## Create AWS Systems Manager Association
 
 Using State Manager associations, we can create a single association that will install the sensor on all of our target instances. The association will use the AWS Systems Manager Distributor package to install the sensor. For more information on State Manager, see the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-state-about.html).
