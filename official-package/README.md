@@ -90,7 +90,7 @@ The distributor package uses an AWS IAM role to assume when running the AWS Syst
 
 - Create/Read/Update AWS Systems Manager Parameter Store parameters
 - Describe AWS EC2 instances to determine the platform
-- Run the `AWS-COnfigureAWSPackage` document to install the sensor
+- Run the `AWS-ConfigureAWSPackage` document to install the sensor
 
 <details><summary>Using CloudFormation</summary>
 
@@ -99,7 +99,7 @@ A CloudFormation template with the required permissions is available under the [
 You can use the below command to download the template and create the stack.
 
 ```bash
-curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-systems-manager/main/distributor/official-package/cloudformation/iam-role.yaml" \
+curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-distributor/main/distributor/official-package/cloudformation/iam-role.yaml" \
 && aws cloudformation create-stack \
   --stack-name crowdstrike-distributor-deploy-role \
   --template-body file://iam-role.yaml \

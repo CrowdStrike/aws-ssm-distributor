@@ -1,0 +1,2 @@
+# Setup Instructions
+Please see the setup guide [here](https://github.com/CrowdStrike/Cloud-AWS/blob/master/systems-manager/documentation/AWS-Systems-Manager-Intro.md#option-b---creating-a-package-without-the-installer)
