@@ -99,7 +99,7 @@ A CloudFormation template with the required permissions is available under the [
 You can use the below command to download the template and create the stack.
 
 ```bash
-curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-distributor/main/distributor/official-package/cloudformation/iam-role.yaml" \
+curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-distributor/main/official-package/cloudformation/iam-role.yaml" \
 && aws cloudformation create-stack \
   --stack-name crowdstrike-distributor-deploy-role \
   --template-body file://iam-role.yaml \

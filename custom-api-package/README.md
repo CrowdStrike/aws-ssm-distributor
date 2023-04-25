@@ -187,7 +187,7 @@ A CloudFormation template with the required permissions is available under the [
 You can use the below command to download the template and create the stack.
 
 ```bash
-curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-distributor/main/distributor/custom-api-package/cloudformation/iam-role.yaml" \
+curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-distributor/main/custom-api-package/cloudformation/iam-role.yaml" \
 && aws cloudformation create-stack \
   --stack-name crowdstrike-distributor-deploy-role \
   --template-body file://iam-role.yaml \
@@ -230,9 +230,10 @@ Here is an example of using the `aws ssm create-automation-document` command to 
 ```bash
 aws ssm create-document \
   --content file://automation-doc.yaml \
-  --name 'Crowdstrike-FalconSensor' \
+  --name 'CrowdStrike-FalconSensorInstall' \
   --document-format YAML \
-  --document-type Automation
+  --document-type Automation \
+  --region us-east-1
 ```
 
 This document has the following parameters:
@@ -269,9 +270,9 @@ Here is an example of creating an association using the AWS CLI that targets all
 
 ```bash
 aws ssm create-association \
-    --name "CrowdStrike-FalconSensor" \
+    --name "CrowdStrike-FalconSensorInstall" \
     --targets "Key=InstanceIds,Values=*" \
-    --parameters "AutomationAssumeRole=arn:aws:iam::111111111:role/crowdstrike-ssm-assume-role" \
+    --parameters "AutomationAssumeRole=arn:aws:iam::111111111:role/crowdstrike-ssm-assume-role,PackageName=CrowdStrike-FalconSensor" \
     --association-name "crowdstrike-falcon-sensor-deploy" \
     --automation-target-parameter-name "InstanceIds" \
     --region "us-east-1"
