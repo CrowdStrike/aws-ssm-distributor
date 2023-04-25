@@ -6,4 +6,5 @@ This repository contains the documentation and source code to deploy the CrowdSt
 
 | Integration | Description | Use Case | API Keys Required |
 | --- | --- | --- | --- |
-| [Official AWS Distributor Package](./distributor/official-package/README.md) | Install the falcon sensor on instances across your aws account using AWS SSM | Automatically install the sensor on Windows and Linux instances. | Yes |
+| [Official AWS Distributor Package](./official-package/README.md) | Install the falcon sensor on instances across your aws account using AWS SSM | Automatically install the sensor on Windows and Linux instances. | Yes |
+| [Custom Distributor Package using API](./custom-api-package/README.md) | Install the falcon sensor on instances across your aws account using AWS SSM | Automatically install the sensor on Windows and Linux instances using a self managed package. | Yes |
