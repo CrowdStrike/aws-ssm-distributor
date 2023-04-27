@@ -14,29 +14,13 @@ osDetail(){
 }
 
 rpmUninstall(){
-   yum remove falcon-sensor -y
+   yum remove falcon-sensor -y $1
 }
 
 aptUninstall(){
-   apt-get -y remove falcon-sensor
+   apt-get -y remove falcon-sensor $1
 }
 
-getAID(){
-    AID=$(/opt/CrowdStrike/falconctl -g --aid)
-    AID=${AID/aid=/}
-    AID=${AID/./}
-}
-
-hideHost(){
-    curl  -X POST "https://api.crowdstrike.com/devices/entities/devices-actions/v2?action_name=hide_host" \
-        -H "Authorization: Bearer $AUTH_TOKEN" \
-        -H "Content-Type: application/json" \
-       	-d "{ \"ids\": [$AID]}" 
-}
-
-
-AUTH_TOKEN=${SSM_CS_AUTH_TOKEN}
-getAID
 osDetail
 case "$OS_NAME" in
     deb?*|Deb?*|ubu?*|Ubu?* )
@@ -57,11 +41,9 @@ case "$OS_NAME" in
 esac
 if [ "$PACKAGER" == "apt" ]
 then
-    aptUninstall
-    hideHost
+    aptUninstall $LINUX_UNINSTALLPARAMS
 elif [ "$PACKAGER" == "yum" ] || [ "$PACKAGER" == "zypper" ]
 then
-    rpmUninstall
-    hideHost
+    rpmUninstall $LINUX_UNINSTALLPARAMS
 fi
 

@@ -70,10 +70,10 @@ if ($env:SSM_CS_INSTALLTOKEN) {
   $installArguments += "ProvToken=${env:SSM_CS_INSTALLTOKEN}"
 }
 
-# If the SsmCsInstallParams environment is set, include it in the installer arguments
+# If the WIN_INSTALLERPARAMS environment is set, include it in the installer arguments
 $space = ' '
-if ($env:SsmCsInstallParams) {
-  $installArguments += $env:SsmCsInstallParams.Split($space)
+if ($env:WIN_INSTALLPARAMS) {
+  $installArguments += $env:WIN_INSTALLPARAMS.Split($space)
 }
 
 Write-Output 'Running installer...'

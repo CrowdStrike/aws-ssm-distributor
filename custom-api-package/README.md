@@ -7,15 +7,15 @@ This deployment guide outlines the steps required to build your own distributor 
 
 > The default installed version will be (latest-release)-1. For example if the latest release of the linux sensor is 5.34.9918 the DEFAULT version installed would be 5.33.9808. It is expected that once installed, sensor versions will be managed via the falcon console.
 
-All commands should be ran from the `./distributor/custom-api-package/package` directory.
+All commands should be ran from the `./custom-api-package/package` directory.
 
 1. Download or clone this repository
     ```bash
-    git clone https://github.com/CrowdStrike/aws-systems-manger.git
+    git clone https://github.com/CrowdStrike/aws-ssm-distributor.git
     ``` 
 2. Change to the `package` directory
     ```bash
-    cd aws-distributor/distributor/custom-api-package/package
+    cd aws-ssm-distributor/custom-api-package/package
     ```
 3. Update `agent_list.json` with the operating systems you want to target.
 
@@ -24,15 +24,15 @@ All commands should be ran from the `./distributor/custom-api-package/package` d
 
       The `agent_list.json` file should list all the directories that will be included in the package. The file should be in json format and contain a list of objects containing the following keys:
 
-    | Key | Description |
-    | --- | --- |
-    | `dir` | The directory that contains the install scripts |
-    | `file` | The name of the zip file that will be created |
-    | `name` | The `code value` used by SSM Distributor. See [here](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html#what-is-a-package-platforms) for a list of valid values |
-    | `arch_type` | The architecture type of the binary. See [here](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html#what-is-a-package-platforms) for a list of valid values |
-    | `major_version` | The major OS version. Must match the exact release version of the operating system Amazon Machine Image (AMI) that you're targeting. |
-    | `minor_version` | The minor OS version. Must match the exact release version of the operating system Amazon Machine Image (AMI) that you're targeting. |
-    | `id` | Optional unique id |
+    | Key             | Description                                                                                                                                                                                |
+    | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+    | `dir`           | The directory that contains the install scripts                                                                                                                                            |
+    | `file`          | The name of the zip file that will be created                                                                                                                                              |
+    | `name`          | The `code value` used by SSM Distributor. See [here](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html#what-is-a-package-platforms) for a list of valid values |
+    | `arch_type`     | The architecture type of the binary. See [here](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html#what-is-a-package-platforms) for a list of valid values      |
+    | `major_version` | The major OS version. Must match the exact release version of the operating system Amazon Machine Image (AMI) that you're targeting.                                                       |
+    | `minor_version` | The minor OS version. Must match the exact release version of the operating system Amazon Machine Image (AMI) that you're targeting.                                                       |
+    | `id`            | Optional unique id                                                                                                                                                                         |
 
     Below is an example `agent_list.json` file that creates a SSM Distributor package that contains install instructions for the following operating systems:
 
@@ -82,11 +82,11 @@ All commands should be ran from the `./distributor/custom-api-package/package` d
     pip3 install -r requirements.txt
     ```
 5. Run the packager script
-      | Parameter | Description | Required | Default |
-      | --- | --- | --- | --- |
-      | `-r` | The aws region to create the ssm distributor package in. | Yes | **N/A** |
-      | `-b` | The name of the s3 bucket to upload the required files to. | Yes | **N/A** |
-      | `-p` | The name of the distributor package to create.| No | **CrowdStrike-FalconSensor** |
+      | Parameter | Description                                                | Required | Default                      |
+      | --------- | ---------------------------------------------------------- | -------- | ---------------------------- |
+      | `-r`      | The aws region to create the ssm distributor package in.   | Yes      | **N/A**                      |
+      | `-b`      | The name of the s3 bucket to upload the required files to. | Yes      | **N/A**                      |
+      | `-p`      | The name of the distributor package to create.             | No       | **CrowdStrike-FalconSensor** |
 
     ```bash
     python3 packager.py -r <AWS_REGION> -b <S3BUCKET> -p <DISTRIBUTOR_PACKAGE_NAME>
@@ -99,10 +99,10 @@ The distributor package uses the CrowdStrike API to download the sensor onto the
 1. In the CrowdStrike console, navigate to **Support and resources** > **API Clients & Keys**. Click **Add new API Client**.
 2. Add the following api scopes:
 
-    | Scope | Permission | Description |
-    | --- | --- | --- |
-    | Installation Tokens | *READ* | Allows the distributor to pull installation tokens from the CrowdStrike API. |
-    | Sensor Download | *READ* | Allows the distributor to download the sensor from the CrowdStrike API. |
+    | Scope               | Permission | Description                                                                  |
+    | ------------------- | ---------- | ---------------------------------------------------------------------------- |
+    | Installation Tokens | *READ*     | Allows the distributor to pull installation tokens from the CrowdStrike API. |
+    | Sensor Download     | *READ*     | Allows the distributor to download the sensor from the CrowdStrike API.      |
 
 3. Click **Add** to create the API client. The next screen will display the API **CLIENT ID**, **SECRET**, and **BASE URL**. You will need all three for the next step.
 
@@ -122,11 +122,11 @@ The distributor package uses AWS Systems Manager Parameter Store to store the AP
 
 The following parameters must be created:
 
-| Default Parameter Name | Parameter Value | Parameter Type |
-| --- | --- | --- |
-| /CrowdStrike/Falcon/Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). | SecureString |
-| /CrowdStrike/Falcon/ClientId | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
-| /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
+| Default Parameter Name           | Parameter Value                                                 | Parameter Type |
+| -------------------------------- | --------------------------------------------------------------- | -------------- |
+| /CrowdStrike/Falcon/Cloud        | The **BASE URL** from [Generate API Keys](#generate-api-keys).  | SecureString   |
+| /CrowdStrike/Falcon/ClientId     | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). | SecureString   |
+| /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys).    | SecureString   |
 > **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the association in the next step.
 
 <details><summary>Using the AWS Console</summary>
@@ -187,7 +187,7 @@ A CloudFormation template with the required permissions is available under the [
 You can use the below command to download the template and create the stack.
 
 ```bash
-curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-distributor/main/custom-api-package/cloudformation/iam-role.yaml" \
+curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-ssm-distributor/main/custom-api-package/cloudformation/iam-role.yaml" \
 && aws cloudformation create-stack \
   --stack-name crowdstrike-distributor-deploy-role \
   --template-body file://iam-role.yaml \
@@ -226,7 +226,7 @@ This document is the entrypoint to the distributor package. It does many things 
 
 Here is an example of using the `aws ssm create-automation-document` command to create the document. See the [create-automation-document documentation](https://docs.aws.amazon.com/cli/latest/reference/ssm/create-automation-document.html) for more information.
 
-> The below command assumes you are in the `aws-distributor/distributor/custom-api-package` directory.
+> The below command assumes you are in the `aws-ssm-distributor/custom-api-package` directory.
 ```bash
 aws ssm create-document \
   --content file://automation-doc.yaml \
@@ -238,17 +238,20 @@ aws ssm create-document \
 
 This document has the following parameters:
 
-| Parameter Name | Description | Default Value | Required |
-| --- | --- | --- | --- |
-| AutomationAssumeRole | The ARN of the role that the automation document will assume. | **N/a** | Yes |
-| PackageName | The name chosen when uploading the distributor package in the [previous step](#create-the-distributor-package). | CrowdStrike-FalconSensor | No |
-| PackageVersion | The version of the distributor package. | **N/a** | No |
-| FalconCloud | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/Cloud** | Yes |
-| FalconClientId | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientId** | Yes |
-| FalconClientSecret | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientSecret** | Yes |
-| Action | Whether to install or uninstall | **Install** | No |
-| InstallationType | The installation type. | **Uninstall and reinstall** | No |
-| InstallerParams | The parameters to pass to the installer. | **N/a** | No |
+| Parameter Name         | Description                                                                                                                      | Default Value                    | Required |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------- |
+| AutomationAssumeRole   | The ARN of the role that the automation document will assume.                                                                    | N/a                              | Yes      |
+| PackageName            | The name chosen when uploading the distributor package in the [previous step](#create-the-distributor-package).                  | CrowdStrike-FalconSensor         | No       |
+| PackageVersion         | The version of the distributor package.                                                                                          | N/a                              | No       |
+| FalconCloud            | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters).  | /CrowdStrike/Falcon/Cloud        | Yes      |
+| FalconClientId         | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | /CrowdStrike/Falcon/ClientId     | Yes      |
+| FalconClientSecret     | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters).    | /CrowdStrike/Falcon/ClientSecret | Yes      |
+| Action                 | Whether to install or uninstall                                                                                                  | Install                          | No       |
+| InstallationType       | The installation type.                                                                                                           | Uninstall and reinstall          | No       |
+| WindowsInstallParams   | The parameters to pass to the installer on Windows nodes.                                                                        | N/a                              | No       |
+| LinuxInstallParams     | The parameters to pass to the installer on Linux nodes.                                                                          | N/a                              | No       |
+| WindowsUninstallParams | The parameters to pass to the uninstaller on Windows nodes.                                                                      | N/a                              | No       |
+| LinuxUninstallParams   | The parameters to pass to the uninstaller on Linux nodes.                                                                        | N/a                              | No       |
 
 
 ## Using the AWS Systems Manager Distributor Package
