@@ -47,7 +47,7 @@ if not python_executable:
     python_executable = "python"
 
 DOWNLOAD_HELPER = "https://raw.githubusercontent.com/CrowdStrike/falconpy/main/samples/sensor_download/download_sensor.py"
-PACKAGER = "https://raw.githubusercontent.com/CrowdStrike/aws-ssm-distributor/main/custom-api-package/package/packager.py?token=GHSAT0AAAAAAB4JNG73TKW26EJUMMR74XM2ZCIJPKA"
+PACKAGER = "https://raw.githubusercontent.com/CrowdStrike/aws-ssm-distributor/main/custom-api-package/package/packager.py"
 
 print("Downloading required files...")
 urlretrieve(DOWNLOAD_HELPER, "download.py")
