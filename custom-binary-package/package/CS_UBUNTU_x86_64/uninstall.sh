@@ -20,7 +20,7 @@ errout () {
 trap 'errout "${LINENO}" "${BASH_COMMAND}" ' EXIT
 
 #Starting
-sudo dpkg -r falcon-sensor $LINUX_UNINSTALLPARAMS
+sudo dpkg -r falcon-sensor $SSM_LINUX_UNINSTALLPARAMS
 
 #Running clean up
 echo "Running cleanup... "

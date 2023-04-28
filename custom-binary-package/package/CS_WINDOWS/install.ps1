@@ -40,9 +40,9 @@ if ($env:INSTALLTOKEN)
 }
 
 $Space = ' '
-if ($env:WIN_INSTALLPARAMS)
+if ($env:SSM_WIN_INSTALLPARAMS)
 {
-    $InstallArguments += $env:WIN_INSTALLPARAMS.Split($Space)
+    $InstallArguments += $env:SSM_WIN_INSTALLPARAMS.Split($Space)
 }
 
 Write-Output 'Running installer...'

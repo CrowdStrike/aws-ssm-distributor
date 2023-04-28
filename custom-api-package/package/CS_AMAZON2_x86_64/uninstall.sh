@@ -41,9 +41,9 @@ case "$OS_NAME" in
 esac
 if [ "$PACKAGER" == "apt" ]
 then
-    aptUninstall $LINUX_UNINSTALLPARAMS
+    aptUninstall $SSM_LINUX_UNINSTALLPARAMS
 elif [ "$PACKAGER" == "yum" ] || [ "$PACKAGER" == "zypper" ]
 then
-    rpmUninstall $LINUX_UNINSTALLPARAMS
+    rpmUninstall $SSM_LINUX_UNINSTALLPARAMS
 fi
 

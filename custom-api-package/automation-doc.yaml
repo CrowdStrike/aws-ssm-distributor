@@ -229,13 +229,13 @@ mainSteps:
         action: '{{Action}}'
         version: '{{PackageVersion}}'
         additionalArguments:
-          SSM_CS_INSTALLTOKEN: '{{GetInstallationToken.InstallationToken}}'
-          SSM_CS_CCID: '{{GetCustomerIdentifier.CCID}}'
-          WIN_INSTALLPARAMS: '{{WindowsInstallParams}}'
-          LINUX_INSTALLPARAMS: '{{LinuxInstallParams}}'
-          WIN_UNINSTALLPARAMS: '{{WindowsUninstallParams}}'
-          LINUX_UNINSTALLPARAMS: '{{LinuxUninstallParams}}'
-          SSM_CS_AUTH_TOKEN: '{{GetAuthenticationToken.AuthToken}}'
-          SSM_CS_HOST: '{{GetAuthenticationToken.FalconCloud}}'
+          SSM_INSTALLTOKEN: '{{GetInstallationToken.InstallationToken}}'
+          SSM_CID: '{{GetCustomerIdentifier.CCID}}'
+          SSM_WIN_INSTALLPARAMS: '{{WindowsInstallParams}}'
+          SSM_LINUX_INSTALLPARAMS: '{{LinuxInstallParams}}'
+          SSM_WIN_UNINSTALLPARAMS: '{{WindowsUninstallParams}}'
+          SSM_LINUX_UNINSTALLPARAMS: '{{LinuxUninstallParams}}'
+          SSM_AUTH_TOKEN: '{{GetAuthenticationToken.AuthToken}}'
+          SSM_HOST: '{{GetAuthenticationToken.FalconCloud}}'
 
 
