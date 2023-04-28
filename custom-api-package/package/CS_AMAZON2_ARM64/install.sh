@@ -46,11 +46,11 @@ Environment Variables:
   CS_INSTALL_TOKEN will set the provisioning token
 
 AWS Systems Manager (SSM) integration:
-  SSM_CS_AUTH_TOKEN will override the value of CS_FALCON_OAUTH_TOKEN.
-  SSM_CS_CCID will override the value of CS_FALCON_CID
-  SSM_CS_NCNT will set the "N-" version count. (2 = N-2 version)
-  SSM_CS_INSTALLPARAMS will set installer parameters, overriding environment / parameter values
-  SSM_CS_INSTALLTOKEN will set the provisioning token, overriding environment / parameter values
+  SSM_AUTH_TOKEN will override the value of CS_FALCON_OAUTH_TOKEN.
+  SSM_CID will override the value of CS_FALCON_CID
+  SSM_NCNT will set the "N-" version count. (2 = N-2 version)
+  SSM_LINUXINSTALLPARAMS will set installer parameters, overriding environment / parameter values
+  SSM_INSTALLTOKEN will set the provisioning token, overriding environment / parameter values
 EOF
 }
 
@@ -90,23 +90,23 @@ if [ "$1" = "-h" ]; then
     exit
 fi
 
-NCNT=${SSM_CS_NCNT}
+NCNT=${SSM_NCNT}
 if [ -z "$NCNT" ]
 then
   NCNT=0
 fi
 CS_FALCON_OAUTH_TOKEN=${CS_FALCON_OAUTH_TOKEN}
-if ! [ -z "$SSM_CS_AUTH_TOKEN" ]
+if ! [ -z "$SSM_AUTH_TOKEN" ]
 then
-    CS_FALCON_OAUTH_TOKEN=${SSM_CS_AUTH_TOKEN}
+    CS_FALCON_OAUTH_TOKEN=${SSM_AUTH_TOKEN}
 fi
 CS_FALCON_CLIENT_ID=${CS_FALCON_CLIENT_ID}
 CS_FALCON_CLIENT_SECRET=${CS_FALCON_CLIENT_SECRET}
 CS_INSTALL_PARAMS=${CS_INSTALL_PARAMS}
 CS_INSTALL_TOKEN=${CS_INSTALL_TOKEN}
-if ! [ -z "$SSM_CS_CCID" ]
+if ! [ -z "$SSM_CID" ]
 then
-    CS_FALCON_CID=${SSM_CS_CCID}
+    CS_FALCON_CID=${SSM_CID}
 fi
 
 if ! [ -z "$3" ] || ! [ -z "$4" ]
@@ -126,20 +126,20 @@ else
     fi
 fi
 
-if ! [ -z "$LINUX_INSTALLPARAMS" ]
+if ! [ -z "$SSM_LINUX_INSTALLPARAMS" ]
 then
-    CS_INSTALL_PARAMS=${LINUX_INSTALLPARAMS}
+    CS_INSTALL_PARAMS=${SSM_LINUX_INSTALLPARAMS}
 fi
-if ! [ -z "$SSM_CS_INSTALLTOKEN" ]
+if ! [ -z "$SSM_INSTALLTOKEN" ]
 then
-    CS_INSTALL_TOKEN="--provisioning-token=${SSM_CS_INSTALLTOKEN}"
+    CS_INSTALL_TOKEN="--provisioning-token=${SSM_INSTALLTOKEN}"
 fi
 
-if ! [ -z "$SSM_CS_HOST" ]
+if ! [ -z "$SSM_HOST" ]
 then
-    if [[ "$SSM_CS_HOST" == "https://"* ]] || [[ "$SSM_CS_HOST" == "http://"* ]]
+    if [[ "$SSM_HOST" == "https://"* ]] || [[ "$SSM_HOST" == "http://"* ]]
     then
-        SSM_CS_HOST=$(echo $SSM_CS_HOST | sed 's/https\?:\/\///')
+        SSM_HOST=$(echo $SSM_HOST | sed 's/https\?:\/\///')
     fi
 fi
 
@@ -153,7 +153,7 @@ elif [ -z "$CS_FALCON_OAUTH_TOKEN" ]; then
         exit 1
     else
         # Let's get a token
-        tokenResult=$(curl -X POST -s -L "https://$SSM_CS_HOST/oauth2/token" \
+        tokenResult=$(curl -X POST -s -L "https://$SSM_HOST/oauth2/token" \
                         -H 'Content-Type: application/x-www-form-urlencoded; charset=utf-8' \
                         -d "client_id=$CS_FALCON_CLIENT_ID&client_secret=$CS_FALCON_CLIENT_SECRET")
         CS_FALCON_OAUTH_TOKEN=$(echo "$tokenResult" | jsonValue "access_token" | sed 's/ *$//g' | sed 's/^ *//g')
@@ -203,7 +203,7 @@ then
 fi
 
 ## Get Installer Versions
-jsonResult=$(curl -s -L -G "https://$SSM_CS_HOST/sensors/combined/installers/v1" --data-urlencode "filter=os:\"$OS_NAME\"" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN")
+jsonResult=$(curl -s -L -G "https://$SSM_HOST/sensors/combined/installers/v1" --data-urlencode "filter=os:\"$OS_NAME\"" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN")
 
 if [[ $jsonResult == *"denied"* ]]; then
     echoRed "Invalid Access Token"
@@ -249,7 +249,7 @@ fi
 filename="$OUTPUT_DESTINATION/$name.$file_type"
 #clean up our calculated sha
 sha=$(echo $sha | xargs)
-curl -s -L "https://$SSM_CS_HOST/sensors/entities/download-installer/v1?id=$sha" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN" -o "$filename"
+curl -s -L "https://$SSM_HOST/sensors/entities/download-installer/v1?id=$sha" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN" -o "$filename"
 
 echo "Sensor binary output to: $filename"
 

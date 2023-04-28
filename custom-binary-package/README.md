@@ -141,10 +141,10 @@ You can pass the following parameters to the `additional-arguments` parameter of
 | CID | The CID of the CrowdStrike Falcon console to connect to. | Yes |
 | INSTALLTOKEN | The install token to use when installing the sensor. | No |
 | MAINTENANCE_TOKEN | The maintenance token to use when uninstalling the sensor on protected hosts. | No |
-| WIN_INSTALLPARAMS | The install parameters to use when installing the sensor on Windows. | No |
-| WIN_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Windows. | No |
-| LINUX_INSTALLPARAMS | The install parameters to use when installing the sensor on Linux. | No |
-| LINUX_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Linux. | No |
+| SSM_WIN_INSTALLPARAMS | The install parameters to use when installing the sensor on Windows. | No |
+| SSM_WIN_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Windows. | No |
+| SSM_LINUX_INSTALLPARAMS | The install parameters to use when installing the sensor on Linux. | No |
+| SSM_LINUX_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Linux. | No |
 
 Example of setting cid and Grouping tags on windows:
 
@@ -154,7 +154,7 @@ On the command line:
 aws ssm send-command \
   --document-name "AWS-ConfigureAWSPackage" \
   --document-version "1" \
-  --parameters '{"action":["Install"],"installationType":["Uninstall and reinstall"],"version":[""],"additionalArguments":["{\n\"CID\": \"123123123123\"\n\"WIN_INSTALLPARAMS\": \"GROUPING_TAGS=tag2,tag1\"\n}"],"name":["CrowdStrike-FalconSensor"]}' \
+  --parameters '{"action":["Install"],"installationType":["Uninstall and reinstall"],"version":[""],"additionalArguments":["{\n\"CID\": \"123123123123\"\n\"SSM_WIN_INSTALLPARAMS\": \"GROUPING_TAGS=tag2,tag1\"\n}"],"name":["CrowdStrike-FalconSensor"]}' \
   --timeout-seconds 600 \
   --max-concurrency "50" \
   --max-errors "0" \

@@ -16,7 +16,7 @@ function errout {
 
 trap 'errout "${LINENO}" "${BASH_COMMAND}" ' ERR
 
-sudo yum -y remove falcon-sensor $LINUX_UNINSTALLPARAMS
+sudo yum -y remove falcon-sensor $SSM_LINUX_UNINSTALLPARAMS
 
 echo "Running cleanup... "
 
