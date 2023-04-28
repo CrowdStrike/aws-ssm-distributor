@@ -20,7 +20,7 @@ $package = Get-Package -Name 'CrowdStrike Windows Sensor'
 $uninstallString = $package.Metadata['BundleCachePath']
 
 # Sets up the arguments to be passed to the uninstall executable
-$uninstallArgs = '/uninstall /quiet' + $env:WIN_UNINSTALLPARAMS
+$uninstallArgs = '/uninstall /quiet' + $env:SSM_WIN_UNINSTALLPARAMS
 
 if ($env:MAINTENANCE_TOKEN) {
   $uninstallArgs += ' MAINTENANCE_TOKEN=' + $env:MAINTENANCE_TOKEN
