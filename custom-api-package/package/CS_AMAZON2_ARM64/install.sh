@@ -126,9 +126,9 @@ else
     fi
 fi
 
-if ! [ -z "$SSM_CS_INSTALLPARAMS" ]
+if ! [ -z "$LINUX_INSTALLPARAMS" ]
 then
-    CS_INSTALL_PARAMS=${SSM_CS_INSTALLPARAMS}
+    CS_INSTALL_PARAMS=${LINUX_INSTALLPARAMS}
 fi
 if ! [ -z "$SSM_CS_INSTALLTOKEN" ]
 then
@@ -261,5 +261,3 @@ if [[ "$PACKAGER" == "apt" ]]
 then
 	aptInstall $filename $CS_FALCON_CID $CS_INSTALL_PARAMS $CS_INSTALL_TOKEN
 fi
-
-
