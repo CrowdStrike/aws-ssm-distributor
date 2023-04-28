@@ -138,29 +138,25 @@ You can pass the following parameters to the `additional-arguments` parameter of
 
 | Parameter | Description | Required |
 | --------- | ----------- | -------- |
-| CID | The CID of the CrowdStrike Falcon console to connect to. | Yes |
-| INSTALLTOKEN | The install token to use when installing the sensor. | No |
-| MAINTENANCE_TOKEN | The maintenance token to use when uninstalling the sensor on protected hosts. | No |
+| SSM_CID | The CID of the CrowdStrike Falcon console to connect to. | Yes |
+| SSM_INSTALLTOKEN | The install token to use when installing the sensor. | No |
 | SSM_WIN_INSTALLPARAMS | The install parameters to use when installing the sensor on Windows. | No |
 | SSM_WIN_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Windows. | No |
 | SSM_LINUX_INSTALLPARAMS | The install parameters to use when installing the sensor on Linux. | No |
 | SSM_LINUX_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Linux. | No |
 
-Example of setting cid and Grouping tags on windows:
+### Example
 
-On the command line:
+Here is an example of creating a SSM State Manager association to install the CrowdStrike sensor on all instances in a region. State manager associations keep a persistent state. Meaning, if you add new instances to the region they will automatically have the sensor installed.
+
+Refer to the [AWS-ConfigureAWSPackage](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor-working-with-packages-deploy.html) for all ways to deploy your package.
 
 ```bash
-aws ssm send-command \
-  --document-name "AWS-ConfigureAWSPackage" \
-  --document-version "1" \
-  --parameters '{"action":["Install"],"installationType":["Uninstall and reinstall"],"version":[""],"additionalArguments":["{\n\"CID\": \"123123123123\"\n\"SSM_WIN_INSTALLPARAMS\": \"GROUPING_TAGS=tag2,tag1\"\n}"],"name":["CrowdStrike-FalconSensor"]}' \
-  --timeout-seconds 600 \
-  --max-concurrency "50" \
-  --max-errors "0" \
-  --region us-east-1
+aws ssm create-association \
+    --name "AWS-ConfigureAWSPackage" \
+    --targets "Key=InstanceIds,Values=*" \
+    --parameters '{"action":["Install"],"installationType":["Uninstall and reinstall"],"version":[""],"additionalArguments":["{\n\"SSM_CID\": \"123123123123\",\n\"SSM_WIN_INSTALLPARAMS\": \"GROUPING_TAGS=tag2,tag1\"\n}"],"name":["CrowdStrike-FalconSensor"]}' \
+    --association-name "crowdstrike-falcon-sensor-deploy" \
+    --automation-target-parameter-name "InstanceIds" \
+    --region "us-east-1"
 ```
-
-In the console:
-
-![Image1](./assets/example_run_command.png)

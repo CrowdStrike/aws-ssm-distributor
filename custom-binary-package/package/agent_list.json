@@ -26,15 +26,6 @@
       "major_version": "_any",
       "minor_version": "",
       "arch_type": "x86_64"
-    },
-    {
-      "id": "ubuntu",
-      "dir": "CS_UBUNTU_20_x86_64",
-      "file": "CS_UBUNTU_20_x86_64.zip",
-      "name": "ubuntu",
-      "major_version": "20",
-      "minor_version": "",
-      "arch_type": "x86_64"
     }
   ],
   "windows": [

@@ -21,22 +21,22 @@ if (-not (Test-Path -Path $InstallerPath))
     throw "${InstallerName} not found."
 }
 
-if (-not $env:CID)
+if (-not $env:SSM_CID)
 {
-    throw 'Missing required param CID. Ensure the target instance is running the latest SSM agent version'
+    throw 'Missing required param SSM_CID. Ensure the target instance is running the latest SSM agent version'
 }
 
 $InstallArguments = @(
     , '/install'
     , '/quiet'
     , '/norestart'
-    , "CID=${env:CID}"
+    , "CID=${env:SSM_CID}"
     , 'ProvWaitTime=180'
 )
 
-if ($env:INSTALLTOKEN)
+if ($env:SSM_INSTALLTOKEN)
 {
-    $InstallArguments += "ProvToken=${env:INSTALLTOKEN}"
+    $InstallArguments += "ProvToken=${env:SSM_INSTALLTOKEN}"
 }
 
 $Space = ' '

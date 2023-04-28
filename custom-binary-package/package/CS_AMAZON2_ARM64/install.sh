@@ -18,4 +18,4 @@ if pgrep  -u root falcon-sensor >/dev/null 2>&1 ; then
   exit 0
 fi
 
-rpmInstall $filename $CID $SSM_LINUX_INSTALLPARAMS
+rpmInstall $filename $SSM_CID $SSM_LINUX_INSTALLPARAMS
