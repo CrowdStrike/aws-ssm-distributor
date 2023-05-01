@@ -180,7 +180,8 @@ Using State Manager associations, we can create a single association that will i
     | FalconClientSecret | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientSecret** | Yes |
     | Action | Whether to install or uninstall | **Install** | No |
     | InstallationType | The installation type. | **Uninstall and reinstall** | No |
-    | InstallerParams | The parameters to pass to the installer. | **N/a** | No |
+    | LinuxInstallerParams | The parameters to pass at install time on Linux nodes. | **N/a** | No |
+    | WindowsInstallerParams | The parameters to pass at install time on Windows nodes.| **N/a** | No |
 
     <details><summary>picture</summary>
     <p>
