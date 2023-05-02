@@ -25,7 +25,7 @@ if ($env:SSM_HOST.EndsWith('/')) {
 
 $headers =  @{
   'Authorization' = "Bearer ${env:SSM_AUTH_TOKEN}"
-  'User-Agent' = 'crowdstrike-custom-distributor-package/v1.0.0'
+  'User-Agent' = 'crowdstrike-custom-api-distributor-package/v1.0.0'
 }
 
 # Sends a GET request to the CrowdStrike API to retrieve the latest installer information
