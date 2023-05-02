@@ -54,6 +54,8 @@ AWS Systems Manager (SSM) integration:
 EOF
 }
 
+userAgent="crowdstrike-custom-api-distributor-package/v1.0.0"
+
 osDetail(){
   UN=$(uname -s)
   if [[ "$UN" == "Darwin" ]]
@@ -155,6 +157,7 @@ elif [ -z "$CS_FALCON_OAUTH_TOKEN" ]; then
         # Let's get a token
         tokenResult=$(curl -X POST -s -L "https://$SSM_HOST/oauth2/token" \
                         -H 'Content-Type: application/x-www-form-urlencoded; charset=utf-8' \
+                        -H "User-Agent: $userAgent" \
                         -d "client_id=$CS_FALCON_CLIENT_ID&client_secret=$CS_FALCON_CLIENT_SECRET")
         CS_FALCON_OAUTH_TOKEN=$(echo "$tokenResult" | jsonValue "access_token" | sed 's/ *$//g' | sed 's/^ *//g')
         if [ -z "$CS_FALCON_OAUTH_TOKEN" ]; then
@@ -203,7 +206,10 @@ then
 fi
 
 ## Get Installer Versions
-jsonResult=$(curl -s -L -G "https://$SSM_HOST/sensors/combined/installers/v1" --data-urlencode "filter=os:\"$OS_NAME\"" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN")
+jsonResult=$(curl -s -L -G "https://$SSM_HOST/sensors/combined/installers/v1" \
+    --data-urlencode "filter=os:\"$OS_NAME\"" \
+    -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN" \
+    -H "User-Agent: $userAgent")
 
 if [[ $jsonResult == *"denied"* ]]; then
     echoRed "Invalid Access Token"
@@ -249,7 +255,10 @@ fi
 filename="$OUTPUT_DESTINATION/$name.$file_type"
 #clean up our calculated sha
 sha=$(echo $sha | xargs)
-curl -s -L "https://$SSM_HOST/sensors/entities/download-installer/v1?id=$sha" -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN" -o "$filename"
+curl -s -L "https://$SSM_HOST/sensors/entities/download-installer/v1?id=$sha" \
+    -H "Authorization: Bearer $CS_FALCON_OAUTH_TOKEN" \
+    -H "User-Agent: $userAgent" \
+    -o "$filename"
 
 echo "Sensor binary output to: $filename"
 
