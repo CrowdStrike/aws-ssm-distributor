@@ -8,11 +8,11 @@ parameters:
       the actions on your behalf. If no role is specified, Systems Manager Automation
       uses your IAM permissions to run this runbook."
     default: ''
-  WindowsInstallParams:
+  WindowsInstallerParams:
     type: String
     default: ''
     description: (Optional) Enter CrowdStrike's install time params for Windows nodes. For more info refer to the Falcon console documentation.
-  LinuxInstallParams:
+  LinuxInstallerParams:
     type: String
     default: ''
     description: (Optional) Enter CrowdStrike's install time params for Linux nodes. For more info refer to the Falcon console documentation.
@@ -231,8 +231,8 @@ mainSteps:
         additionalArguments:
           SSM_INSTALLTOKEN: '{{GetInstallationToken.InstallationToken}}'
           SSM_CID: '{{GetCustomerIdentifier.CCID}}'
-          SSM_WIN_INSTALLPARAMS: '{{WindowsInstallParams}}'
-          SSM_LINUX_INSTALLPARAMS: '{{LinuxInstallParams}}'
+          SSM_WIN_INSTALLPARAMS: '{{WindowsInstallerParams}}'
+          SSM_LINUX_INSTALLPARAMS: '{{LinuxInstallerParams}}'
           SSM_WIN_UNINSTALLPARAMS: '{{WindowsUninstallParams}}'
           SSM_LINUX_UNINSTALLPARAMS: '{{LinuxUninstallParams}}'
           SSM_AUTH_TOKEN: '{{GetAuthenticationToken.AuthToken}}'

@@ -248,8 +248,8 @@ This document has the following parameters:
 | FalconClientSecret     | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters).    | /CrowdStrike/Falcon/ClientSecret | Yes      |
 | Action                 | Whether to install or uninstall                                                                                                  | Install                          | No       |
 | InstallationType       | The installation type.                                                                                                           | Uninstall and reinstall          | No       |
-| WindowsInstallParams   | The parameters to pass to the installer on Windows nodes.                                                                        | N/a                              | No       |
-| LinuxInstallParams     | The parameters to pass to the installer on Linux nodes.                                                                          | N/a                              | No       |
+| WindowsInstallerParams   | The parameters to pass to the installer on Windows nodes.                                                                        | N/a                              | No       |
+| LinuxInstallerParams     | The parameters to pass to the installer on Linux nodes.                                                                          | N/a                              | No       |
 | WindowsUninstallParams | The parameters to pass to the uninstaller on Windows nodes.                                                                      | N/a                              | No       |
 | LinuxUninstallParams   | The parameters to pass to the uninstaller on Linux nodes.                                                                        | N/a                              | No       |
 
