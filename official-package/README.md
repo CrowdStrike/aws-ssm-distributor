@@ -132,10 +132,23 @@ aws iam create-role \
 ```
 </details>
 
+## Using the AWS Systems Manager Distributor Package
 
-## Create AWS Systems Manager Association
+Once you've completed the above steps you are ready to start using the distributor package and the aws automation document. You will not execute the distributor package directly. Instead, you will use the published automation document `CrowdStrike-FalconSensorDeploy`.
 
-Using State Manager associations, we can create a single association that will install the sensor on all of our target instances. The association will use the AWS Systems Manager Distributor package to install the sensor. For more information on State Manager, see the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-state-about.html).
+The automation document generates the necessary parameters that will be passed to the distributor package. You have various options to execute the automation document. Refer to the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations.html) for further details on different methods to execute this automation document.
+
+This guide will explain how to use the AWS Systems Manager State Manager to install the sensor on all instances within our region.
+
+### Create AWS Systems Manager Association
+
+Using State Manager associations, we can create a single association that will do the following:
+
+- Install the CrowdStrike Falcon sensor on all instances (Windows and Linux) within the region
+- Run on a schedule to ensure the sensor is always present on every instance
+- Install the sensor on newly created machines automatically
+
+For more information on State Manager, see the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-state-about.html).
 
 > **Note:** There are two distributor packages available because the falcon sensor for Windows and Linux have a different version number. You will be able to target a specific version for each OS in the association parameters.
 
@@ -143,7 +156,7 @@ Using State Manager associations, we can create a single association that will i
 <p>
 
 1. In the AWS console, go to **AWS Systems Manager** > **Node Management** > **Distributor** > **Third Party**.
-2. Select either package.
+2. Select either package (It does not matter).
     <details><summary>picture</summary>
     <p>
 
@@ -151,8 +164,9 @@ Using State Manager associations, we can create a single association that will i
 
     </p>
     </details>
-3. Under **Document** choose **Default at runtime** for **Document Version** (the default document version will always be the most stable)
-4. Under **Execution** choose **Rate Control** 
+3. Click `Install on a schedule`. This will redirect you to the `Create Association` page with the `CrowdStrike-FalconSensorDeploy` document preselected.
+4. Under **Document** choose **Default at runtime** for **Document Version** (the default document version will always be the most stable)
+5. Under **Execution** choose **Rate Control** 
     <details><summary>picture</summary>
     <p>
 
@@ -160,8 +174,8 @@ Using State Manager associations, we can create a single association that will i
 
     </p>
     </details>
-5. Under **Targets** > **Parameter** choose **InstanceIds**.
-6. Under **Targets** > **Targets** choose the method you want to use to target instances. In our example we are going to target all instances. For more information on targeting instances, see [Targeting](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations-map-targets.html).
+6. Under **Targets** > **Parameter** choose **InstanceIds**.
+7. Under **Targets** > **Targets** choose the method you want to use to target instances. In our example we are going to target all instances. For more information on targeting instances, see [Targeting](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations-map-targets.html).
     <details><summary>picture</summary>
     <p>
 
@@ -169,7 +183,7 @@ Using State Manager associations, we can create a single association that will i
 
     </p>
     </details>
-7. Fill in the required parameters. 
+8. Fill in the required parameters. 
     | Parameter Name | Description | Default Value | Required |
     | --- | --- | --- | --- |
     | AutomationAssumeRole | The ARN of the role that the automation document will assume. | **N/a** | Yes |
@@ -190,7 +204,7 @@ Using State Manager associations, we can create a single association that will i
 
     </p>
     </details>
-8. Click **Create Association**.
+9. Click **Create Association**.
 
 </p>
 </details>
