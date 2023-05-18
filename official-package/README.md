@@ -4,6 +4,36 @@ This deployment guide outlines the steps required to use the published third par
 
 New versions of the Falcon Distributor Package are published to AWS every time a new version of the Falcon Sensor is released.
 
+# Supported Operating Systems
+
+The official distributor package supports the following operating systems:
+
+| Operating System | Architecture |
+| --- | --- |
+| Amazon Linux 1 | x86_64 |
+| Amazon Linux 2 | x86_64, arm64 |
+| Red Hat Enterprise Linux 6 | x86_64 |
+| Red Hat Enterprise Linux 7 | x86_64 |
+| Red Hat Enterprise Linux 8 | x86_64, arm64 |
+| Red Hat Enterprise Linux 9 | x86_64 |
+| CentOS 6 | x86_64 |
+| CentOS 7 | x86_64 |
+| CentOS 8 | x86_64, arm64 |
+| Oracle Enterprise Linux 6 | x86_64 |
+| Oracle Enterprise Linux 7 | x86_64 |
+| Oracle Enterprise Linux 8 | x86_64 |
+| SUSE Linux Enterprise Server 11 | x86_64 |
+| SUSE Linux Enterprise Server 12 | x86_64 |
+| SUSE Linux Enterprise Server 15 | x86_64 |
+| Ubuntu 16.04 | x86_64 |
+| Ubuntu 18.04 | x86_64 |
+| Ubuntu 20.04 | x86_64 |
+| Ubuntu 22.04 | x86_64 |
+| All Windows Versions supported by the CrowdStrike Sensor | x86_64 |
+
+> Note: For supported Windows versions, check the CrowdStrike documentation.
+
+
 ## Generate API Keys
 
 The distributor package uses the CrowdStrike API to download the sensor onto the target instance. It is highly recommended that you create a dedicated API client for the distributor package.
