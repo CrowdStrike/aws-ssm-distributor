@@ -256,7 +256,7 @@ This document has the following parameters:
 
 ## Using the AWS Systems Manager Distributor Package
 
-Once you've completed the above steps are you ready to start using the distributor package and the aws automation document. You will not execute the distributor package directly. Instead, you will use the automation document we created in the previous step.
+Once you've completed the above steps you are ready to start using the distributor package and the aws automation document. You will not execute the distributor package directly. Instead, you will use the automation document we created in the previous step.
 
 The automation document creates the required parameters that will be passed to the distributor package. You can execute the automation document in many ways. See the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations.html) for more information.
 
