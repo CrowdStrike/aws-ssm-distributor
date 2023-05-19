@@ -137,7 +137,7 @@ curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-ss
 ```
 </details>
 
-<details>> <summary>Using the AWS CLI</summary>
+<details> <summary>Using the AWS CLI</summary>
 
 We can use the `aws iam create-role` command to create the role from the CLI. See the [create-role documentation](https://docs.aws.amazon.com/cli/latest/reference/iam/create-role.html) for more information.
 
@@ -157,9 +157,17 @@ aws iam create-role \
         ]
     }' \
     --description "Role for running SSM automation documents" \
-    --max-session-duration 3600 \
-    --permissions-boundary "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
+    --max-session-duration 3600
 ```
+
+Then we need to attach the required policies to the role. See the [attach-role-policy documentation](https://docs.aws.amazon.com/cli/latest/reference/iam/attach-role-policy.html) for more information.
+
+```bash
+aws iam attach-role-policy \
+    --role-name crowdstrike-distributor-deploy-role \
+    --policy-arn arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
+```
+
 </details>
 
 ## Using the AWS Systems Manager Distributor Package
