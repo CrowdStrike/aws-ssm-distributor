@@ -163,3 +163,9 @@ aws ssm create-association \
     --automation-target-parameter-name "InstanceIds" \
     --region "us-east-1"
 ```
+
+## FAQ
+
+### How do I upgrade/downgrade the sensor?
+
+CrowdStrike Falcon Sensor upgrades and downgrades should be handled by update policies. The distributor package will not upgrade or downgrade the sensor. The distributor package should be used to install the sensor and then allow update policies to manage the sensor version.
