@@ -4,7 +4,7 @@ This deployment guide outlines the steps required to use the published third par
 
 New versions of the Falcon Distributor Package are published to AWS every time a new version of the Falcon Sensor is released.
 
-# Supported Operating Systems
+## Supported Operating Systems
 
 The official distributor package supports the following operating systems:
 
@@ -33,6 +33,8 @@ The official distributor package supports the following operating systems:
 
 > Note: For supported Windows versions, check the CrowdStrike documentation.
 
+## Setting up Systems Manager
+Distributor is a feature of AWS Systems Manager. In order to use the distributor package, you must first setup AWS Systems Manager. See the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-setting-up.html) for more information.
 
 ## Generate API Keys
 
