@@ -4,6 +4,8 @@ This deployment guide outlines the steps required to use the published third par
 
 New versions of the Falcon Distributor Package are published to AWS every time a new version of the Falcon Sensor is released.
 
+If you have a question checkout the [FAQ](#faq) to see if your question has already been answered. If you have a question that is not answered in the FAQ, please open an issue and we will happily help.
+
 ## Supported Operating Systems
 
 The official distributor package supports the following operating systems:
@@ -301,4 +303,14 @@ CrowdStrike Falcon Sensor upgrades and downgrades should be handled by update po
 If a region you need is not supported you can still use the [custom-binary-package](../custom-binary-package) or [custom-api-package](../custom-api-package) to install the sensor.
 
 If you would like to request support for a region, please reach out to your CrowdStrike representative.
+</details>
+
+### Where is the `CrowdStrike-FalconSensorDeploy` automation document?
+
+The `CrowdStrike-FalconSensorDeploy` automation document can be found in the AWS console under **AWS Systems Manager** > **Documents** > **All documents** > search for `CrowdStrike-FalconSensorDeploy`.
+
+<details><summary>picture</summary>
+
+![automation-document](./assets/automation-document.png)
+
 </details>
