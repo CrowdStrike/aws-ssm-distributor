@@ -4,7 +4,7 @@ This deployment guide outlines the steps required to use the published third par
 
 New versions of the Falcon Distributor Package are published to AWS every time a new version of the Falcon Sensor is released.
 
-If you have a question checkout the [FAQ](#faq) to see if your question has already been answered. If you have a question that is not answered in the FAQ, please open an issue and we will happily help.
+If you have a question checkout the [FAQ](#faq) to see if it has already been answered. If it has not been answered in the FAQ, please open an [issue](https://github.com/CrowdStrike/aws-ssm-distributor/issues/new/choose) and we will happily help.
 
 ## Supported Operating Systems
 
