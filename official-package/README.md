@@ -172,15 +172,29 @@ aws iam attach-role-policy \
 
 </details>
 
-## Using the AWS Systems Manager Distributor Package
+## Deploying the CrowdStrike Falcon Sensor
 
-Once you've completed the above steps you are ready to start using the distributor package and the aws automation document. You will not execute the distributor package directly. Instead, you will use the published automation document `CrowdStrike-FalconSensorDeploy`.
+Once you've completed the above steps you are ready to start deploying the CrowdStrike Falcon Sensor on your SSM manged nodes. You will not execute the distributor package directly. Instead, you will use the published automation document `CrowdStrike-FalconSensorDeploy`.
 
 The automation document generates the necessary parameters that will be passed to the distributor package. You have various options to execute the automation document. Refer to the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations.html) for further details on different methods to execute this automation document.
 
-This guide will explain how to use the AWS Systems Manager State Manager to install the sensor on all instances within our region.
+The automation document has the following parameters:
 
-### Create AWS Systems Manager Association
+| Parameter Name | Description | Default Value | Required |
+| --- | --- | --- | --- |
+| InstanceIds| The instance IDs of the instances where the sensor will be installed. | **N/a** | Yes |
+| AutomationAssumeRole | The ARN of the role that the automation document will assume. | **N/a** | Yes |
+| FalconCloud | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/Cloud** | Yes |
+| FalconClientId | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientId** | Yes |
+| FalconClientSecret | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientSecret** | Yes |
+| Action | Whether to install or uninstall | **Install** | No |
+| InstallationType | The installation type. | **Uninstall and reinstall** | No |
+| LinuxPackageVersion | The Linux version of the package to install. | **N-2** | No |
+| LinuxInstallerParams | The parameters to pass at install time on Linux nodes. | **N/a** | No |
+| WindowsPackageVersion | The Windows version of the package to install. | **N-2** | No |
+| WindowsInstallerParams | The parameters to pass at install time on Windows nodes.| **N/a** | No |
+
+### Example: Using Systems Manager Associations
 
 Using State Manager associations, we can create a single association that will do the following:
 
@@ -205,6 +219,7 @@ For more information on State Manager, see the [AWS documentation](https://docs.
     </p>
     </details>
 3. Click `Install on a schedule`. This will redirect you to the `Create Association` page with the `CrowdStrike-FalconSensorDeploy` document preselected.
+    > **Note**: This is the same as going to **AWS Systems Manager** > **Node Management** > **State Manager** > **Create Association** and selecting the `CrowdStrike-FalconSensorDeploy` document.
 4. Under **Document** choose **Default at runtime** for **Document Version** (the default document version will always be the most stable)
 5. Under **Execution** choose **Rate Control** 
     <details><summary>picture</summary>
@@ -223,19 +238,7 @@ For more information on State Manager, see the [AWS documentation](https://docs.
 
     </p>
     </details>
-8. Fill in the required parameters. 
-    | Parameter Name | Description | Default Value | Required |
-    | --- | --- | --- | --- |
-    | AutomationAssumeRole | The ARN of the role that the automation document will assume. | **N/a** | Yes |
-    | LinuxPackageVersion | The Linux version of the package to install. | **N-2** | No |
-    | WindowsPackageVersion | The Windows version of the package to install. | **N-2** | No |
-    | FalconCloud | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/Cloud** | Yes |
-    | FalconClientId | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientId** | Yes |
-    | FalconClientSecret | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientSecret** | Yes |
-    | Action | Whether to install or uninstall | **Install** | No |
-    | InstallationType | The installation type. | **Uninstall and reinstall** | No |
-    | LinuxInstallerParams | The parameters to pass at install time on Linux nodes. | **N/a** | No |
-    | WindowsInstallerParams | The parameters to pass at install time on Windows nodes.| **N/a** | No |
+8. Fill in the required parameters. For more information on each parameter, reference the parameters table in the [Deploying the CrowdStrike Falcon Sensor](#deploying-the-crowdstrike-falcon-sensor) section.
 
     <details><summary>picture</summary>
     <p>
@@ -264,6 +267,8 @@ aws ssm create-association \
     --automation-target-parameter-name "InstanceIds" \
     --region "us-east-1"
 ``` 
+
+For more information on each parameter, reference the parameters table in the [Deploying the CrowdStrike Falcon Sensor](#deploying-the-crowdstrike-falcon-sensor) section.
 
 </p>
 </details>
