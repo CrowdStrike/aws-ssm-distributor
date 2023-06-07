@@ -230,6 +230,14 @@ For more information on State Manager, see the [AWS documentation](https://docs.
     </p>
     </details>
 6. Under **Targets** > **Parameter** choose **InstanceIds**.
+    <details><summary>picture</summary>
+    <p>
+
+    ![targets-section](./assets/targets-section.png)
+
+    </p>
+    </details>
+
 7. Under **Targets** > **Targets** choose the method you want to use to target instances. In our example we are going to target all instances. For more information on targeting instances, see [Targeting](https://docs.aws.amazon.com/systems-manager/latest/userguide/running-automations-map-targets.html).
     <details><summary>picture</summary>
     <p>
@@ -247,7 +255,7 @@ For more information on State Manager, see the [AWS documentation](https://docs.
 
     </p>
     </details>
-9. Click **Create Association**.
+9.  Click **Create Association**.
 
 </p>
 </details>
