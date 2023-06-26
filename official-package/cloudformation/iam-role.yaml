@@ -3,6 +3,17 @@ Parameters:
   RoleName:
     Type: String
     Default: 'crowdstrike-distributor-deploy-role'
+    Description: 'Name of the IAM role to create'
+  SecretStorageMethod:
+    Type: String
+    Default: ParameterStore
+    Description: 'The method used to store the Falcon ClientId, ClientSecret, and Cloud for the CrowdStrike APIs.'
+    AllowedValues:
+      - 'ParameterStore'
+      - 'SecretsManager'
+
+Conditions:
+  UseSecretsManager: !Equals [!Ref SecretStorageMethod, 'SecretsManager']
 
 Resources:
   SsmAutomationRole:
@@ -18,3 +29,7 @@ Resources:
             Action: 'sts:AssumeRole'
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole'
+        - !If
+            - UseSecretsManager
+            - 'arn:aws:iam::aws:policy/SecretsManagerReadWrite'
+            - !Ref 'AWS::NoValue'
