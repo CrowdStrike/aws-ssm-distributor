@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Secrets Manager as a option for storing the required secrets (Client ID, Client Secret, and Cloud).
 - `User-Agent` header to track usage.
+- Oauth tokens are revoked after the run is complete.
  
 ### Changed
 
@@ -19,10 +20,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Prevent api calls if sensor is already installed.
 - 3xx redirects now use the `Location` header to determine the correct url instead of throwing an error.
 - Rewrote automation document to handle common api errors
+- `FalconSensor-Linux` and `FalconSensor-Windows` can now be used for both operating systems. There is no difference between the two packages.
+- Update linux/windows install scripts to install the n-1 version, but allow a specific version using `LinuxPackageVersion` or `WindowsPackageVersion`
+- Instead of releasing a distributor package per sensor version, we now version the package by changes to the script. Current version is `v1.0.0`
+- In-place update is the default install behavior. Sensor version upgrades and downgrades should be handled by Sensor Update Policies.
+- IAM Role CloudFormation now includes permissions for secrets manager.
  
 ### Fixed
 
 - CFT for required role missing permissions.
+- The automation document now fails correctly when windows machines fail. Previously the status would show success.
 
 ### Misc
 
