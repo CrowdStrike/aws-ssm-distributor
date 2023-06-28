@@ -2,8 +2,6 @@
 
 This deployment guide outlines the steps required to use the published third party distributor package in AWS. This method prevents the need to build your own packages and publish your own SSM automation documents to AWS.
 
-New versions of the Falcon Distributor Package are published to AWS every time a new version of the Falcon Sensor is released.
-
 If you have a question checkout the [FAQ](#faq) to see if it has already been answered. If it has not been answered in the FAQ, please open an [issue](https://github.com/CrowdStrike/aws-ssm-distributor/issues/new/choose) and we will happily help.
 
 ## Supported Operating Systems
@@ -62,9 +60,78 @@ The distributor package uses the CrowdStrike API to download the sensor onto the
 
 > Note: This page is only shown once. Make sure you copy **CLIENT ID**, **SECRET**, and **BASE URL** to a secure location.
 
-## Create AWS Parameter Store Parameters
+## Store API Keys in AWS
 
-The distributor package uses AWS Systems Manager Parameter Store to store the API keys. You can create the parameters in the AWS console or using the AWS CLI.
+We support both AWS Secrets Manager and AWS Parameter Store as secret backends. Choose which one fits your environment the best.
+
+Generally Secrets Manager will be better for larger deployments because Secrets Manager has cross region replication and can be created by CloudFormation. This makes deploying a lot easier than Parameter Store.
+
+The benefit of Parameter Store is there is no cost for basic parameters.
+
+<details><summary>Using AWS Secrets Manager</summary>
+
+To use Secrets Manager as your secret backend, you must choose `SecretsManager` as the value for the `SecretStorageMethod` parameter when running the automation document: `CrowdStrike-FalconSensorDeploy`. There will be more information on this in the following sections.
+
+By default, the automation document looks for a secret named `/CrowdStrike/Falcon/Distributor` with the following key/value pairs:
+
+| Key | Value |
+| --- | --- |
+| ClientId | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |
+| ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). |
+| Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). |
+
+You can use any secret name you like, as long as you pass in the secret name when running the automation document. The keys must match the table above.
+
+<details><summary>Using the AWS Console</summary>
+
+1. In your AWS console, navigate to **AWS Secrets Manager** > **Secrets**.
+2. Click **Store a new secret**.
+3. Choose **Other type of secret**.
+4. Fill in the secret key/value pairs from the table above.
+    <details><summary>picture</summary>
+    <p>
+
+    ![SecretsManagerKeyValue](./assets/secrets-manager-key-value.png)
+
+    </p>
+    </details>
+5. Fill in the optional fields if you want. Click **Next**.
+6. Give the secret a name. The default name the distributor package looks for is `/CrowdStrike/Falcon/Distributor`. You can use any name you want as long as you override the default value for `SecretsManagerSecretName` when running the automation document.
+    <details><summary>picture</summary>
+    <p>
+
+    ![SecretsManagerName](./assets/secrets-manager-secret-name.png)
+
+    </p>
+    </details>
+7. Fill in the optional fields if you want. Click **Next**. 
+8. Configure the optional rotation settings if you want. Click **Next**.
+9.  Review and click **Store**.
+</details>
+
+<details><summary>Using the AWS CLI</summary>
+
+We can use the `aws secretsmanager create-secret` command to create the secret from the cli. See the [create-secret documentation](https://docs.aws.amazon.com/cli/latest/reference/secretsmanager/create-secret.html) for more information.  
+
+The following command will create a secret named `/CrowdStrike/Falcon/Distributor` with the key/value pairs from the table above.
+
+```bash
+aws secretsmanager create-secret \
+    --name /CrowdStrike/Falcon/Distributor \
+    --secret-string '{"ClientId":"<CLIENT_ID>","ClientSecret":"<CLIENT_SECRET>","Cloud":"<BASE_URL>"}'
+```
+
+</details>
+
+---
+
+</details>
+
+
+<details><summary>Using AWS Parameter Store</summary>
+To use Parameter Store as your secret backend, you must choose `ParameterStore` as the value for the `SecretStorageMethod` parameter when running the automation document: `CrowdStrike-FalconSensorDeploy`. There will be more information on this in the following sections.
+
+You can create the parameters in the AWS console or using the AWS CLI.
 
 The following parameters must be created:
 
@@ -117,12 +184,15 @@ aws ssm put-parameter \
 
 </p>
 </details>
+</details>
+
 
 ## Create AWS IAM Role
 
 The distributor package uses an AWS IAM role to assume when running the AWS Systems Manager Automation document. The role is used for the following:
 
-- Create/Read/Update AWS Systems Manager Parameter Store parameters
+- Read AWS Systems Manager Parameter Store parameters (If using Parameter Store as the secret backend)
+- Read AWS Secrets Manager secrets (If using Secrets Manager as the secret backend)
 - Describe AWS EC2 instances to determine the platform
 - Run the `AWS-ConfigureAWSPackage` document to install the sensor
 
@@ -137,8 +207,14 @@ curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-ss
 && aws cloudformation create-stack \
   --stack-name crowdstrike-distributor-deploy-role \
   --template-body file://iam-role.yaml \
-  --capabilities CAPABILITY_NAMED_IAM
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameters ParameterKey=SecretStorageMethod,ParameterValue=ParameterStore
 ```
+
+If you want to use Secrets Manager as the secret backend, replace `ParameterStore` with `SecretsManager`.
+
+```bash
+
 </details>
 
 <details> <summary>Using the AWS CLI</summary>
@@ -172,6 +248,13 @@ aws iam attach-role-policy \
     --policy-arn arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
 ```
 
+If you want to use Secrets Manager as the secret backend, you must also attach a policy that allows the role to read secrets from Secrets Manager. If you do not want to create your own policy you can use the following:
+
+```bash
+aws iam attach-role-policy \
+    --role-name crowdstrike-distributor-deploy-role \
+    --policy-arn arn:aws:iam::aws:policy/SecretsManagerReadWrite
+```
 </details>
 
 ## Deploying the CrowdStrike Falcon Sensor
@@ -186,14 +269,15 @@ The automation document has the following parameters:
 | --- | --- | --- | --- |
 | InstanceIds| The instance IDs of the instances where the sensor will be installed. | **N/a** | Yes |
 | AutomationAssumeRole | The ARN of the role that the automation document will assume. | **N/a** | Yes |
-| FalconCloud | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/Cloud** | Yes |
-| FalconClientId | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientId** | Yes |
-| FalconClientSecret | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientSecret** | Yes |
+| SecretStorageMethod | The secret backend to use. Can be **ParameterStore** or **SecretsManager** | **ParameterStore** | Yes |
+| SecretsManagerSecretName | The name of the secret in Secrets Manager. | **/CrowdStrike/Falcon/Distributor** | Yes, if `SecretStorageMethod` is **SecretsManager** |
+| FalconCloud | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/Cloud** | Yes, if `SecretStorageMethod` is **ParameterStore** |
+| FalconClientId | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientId** | Yes, if `SecretStorageMethod` is **ParameterStore** |
+| FalconClientSecret | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientSecret** | Yes, if `SecretStorageMethod` is **ParameterStore** |
 | Action | Whether to install or uninstall | **Install** | No |
-| InstallationType | The installation type. | **Uninstall and reinstall** | No |
-| LinuxPackageVersion | The Linux version of the package to install. | **N-2** | No |
+| LinuxPackageVersion | The Linux version of the package to install. | **N-1** | No |
 | LinuxInstallerParams | The parameters to pass at install time on Linux nodes. | **N/a** | No |
-| WindowsPackageVersion | The Windows version of the package to install. | **N-2** | No |
+| WindowsPackageVersion | The Windows version of the package to install. | **N-1** | No |
 | WindowsInstallerParams | The parameters to pass at install time on Windows nodes.| **N/a** | No |
 
 ### Example: Using Systems Manager Associations
@@ -206,13 +290,13 @@ Using State Manager associations, we can create a single association that will d
 
 For more information on State Manager, see the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-state-about.html).
 
-> **Note:** There are two distributor packages available because the falcon sensor for Windows and Linux have a different version number. You will be able to target a specific version for each OS in the association parameters.
+> **Note:** There are two distributor packages one for Windows and Linux. This was due to the way packages were versioned at launch. Starting version v1.0.0 and later there is no difference between the two packages. You can choose either package and it will work on both Windows and Linux. In the future this may be replaced with a single package.
 
 <details><summary>Using the AWS Console</summary>
 <p>
 
 1. In the AWS console, go to **AWS Systems Manager** > **Node Management** > **Distributor** > **Third Party**.
-2. Select either package (It does not matter).
+2. Select either package (It does not matter, see note above).
     <details><summary>picture</summary>
     <p>
 
