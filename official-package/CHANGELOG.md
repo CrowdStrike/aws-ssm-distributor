@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
  
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+## [v1.1.0] - 07-28-2023
+
+### Added
+
+- Support for Amazon Linux 2023 (arm64 and x86_64)
+- Support for Ubuntu 18/20/22 arm64
+- Support for Debian 9/10/11 x86_64
+
+### Fixed
+
+- Fixed noninteractive warnings on debian based systems
  
 ## [v1.0.0] - 06-28-2023
  
