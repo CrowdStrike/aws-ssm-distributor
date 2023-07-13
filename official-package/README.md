@@ -12,6 +12,7 @@ The official distributor package supports the following operating systems:
 | --- | --- |
 | Amazon Linux 1 | x86_64 |
 | Amazon Linux 2 | x86_64, arm64 |
+| Amazon Linux 2023 | x86_64, arm64 |
 | Red Hat Enterprise Linux 6 | x86_64 |
 | Red Hat Enterprise Linux 7 | x86_64 |
 | Red Hat Enterprise Linux 8 | x86_64, arm64 |
@@ -26,9 +27,12 @@ The official distributor package supports the following operating systems:
 | SUSE Linux Enterprise Server 12 | x86_64 |
 | SUSE Linux Enterprise Server 15 | x86_64 |
 | Ubuntu 16.04 | x86_64 |
-| Ubuntu 18.04 | x86_64 |
-| Ubuntu 20.04 | x86_64 |
-| Ubuntu 22.04 | x86_64 |
+| Ubuntu 18.04 | x86_64, arm64 |
+| Ubuntu 20.04 | x86_64, arm64 |
+| Ubuntu 22.04 | x86_64, arm64 |
+| Debian 9 | x86_64 |
+| Debian 10 | x86_64 |
+| Debian 11 | x86_64
 | All Windows Versions supported by the CrowdStrike Sensor | x86_64 |
 
 > Note: For supported Windows versions, check the CrowdStrike documentation.
