@@ -245,14 +245,14 @@ This document has the following parameters:
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------- |
 | AutomationAssumeRole   | The ARN of the role that the automation document will assume.                                                                    | N/a                              | Yes      |
 | PackageName            | The name chosen when uploading the distributor package in the [previous step](#create-the-distributor-package).                  | CrowdStrike-FalconSensor         | No       |
-| PackageVersion         | The version of the distributor package.                                                                                          | N/a                              | No       |
+| PackageVersion         | The aws distributor package version to execute.                                                                                  | N/a                              | No       |
 | FalconCloud            | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters).  | /CrowdStrike/Falcon/Cloud        | Yes      |
 | FalconClientId         | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | /CrowdStrike/Falcon/ClientId     | Yes      |
 | FalconClientSecret     | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters).    | /CrowdStrike/Falcon/ClientSecret | Yes      |
 | Action                 | Whether to install or uninstall                                                                                                  | Install                          | No       |
 | InstallationType       | The installation type.                                                                                                           | Uninstall and reinstall          | No       |
-| WindowsInstallerParams   | The parameters to pass to the installer on Windows nodes.                                                                        | N/a                              | No       |
-| LinuxInstallerParams     | The parameters to pass to the installer on Linux nodes.                                                                          | N/a                              | No       |
+| WindowsInstallerParams | The parameters to pass to the installer on Windows nodes.                                                                        | N/a                              | No       |
+| LinuxInstallerParams   | The parameters to pass to the installer on Linux nodes.                                                                          | N/a                              | No       |
 | WindowsUninstallParams | The parameters to pass to the uninstaller on Windows nodes.                                                                      | N/a                              | No       |
 | LinuxUninstallParams   | The parameters to pass to the uninstaller on Linux nodes.                                                                        | N/a                              | No       |
 
