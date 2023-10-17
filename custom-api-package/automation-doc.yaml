@@ -41,6 +41,10 @@ parameters:
     type: String
     description: '(Required) The name of the distributor package to run.'
     default: CrowdStrike-FalconSensor
+  PackageVersion:
+    type: String
+    description: '(Optional) The aws distributor package version to execute.'
+    default: ''
   LinuxPackageVersion:
     type: String
     description: '(Optional) The version of the package to on Linux nodes. Defaults to n-1, where n is the latest version.'
