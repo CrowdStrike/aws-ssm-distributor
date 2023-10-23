@@ -6,6 +6,8 @@ This deployment guide outlines the steps required to build your own distributor 
 ## Setting up Systems Manager
 Distributor is a feature of AWS Systems Manager. In order to use the distributor package, you must first setup AWS Systems Manager. See the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-setting-up.html) for more information.
 
+A ssm agent version of `2.3.1550.0` or greater is required.
+
 ## Create the Distributor Package
 
 > The default installed version will be (latest-release)-1. For example if the latest release of the linux sensor is 5.34.9918 the DEFAULT version installed would be 5.33.9808. It is expected that once installed, sensor versions will be managed via the falcon console.

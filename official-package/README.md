@@ -40,6 +40,8 @@ The official distributor package supports the following operating systems:
 ## Setting up Systems Manager
 Distributor is a feature of AWS Systems Manager. In order to use the distributor package, you must first setup AWS Systems Manager. See the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-setting-up.html) for more information.
 
+A ssm agent version of `2.3.1550.0` or greater is required.
+
 ## Generate API Keys
 
 The distributor package uses the CrowdStrike API to download the sensor onto the target instance. It is highly recommended that you create a dedicated API client for the distributor package.
