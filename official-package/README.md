@@ -281,9 +281,9 @@ The automation document has the following parameters:
 | FalconClientId | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientId** | Yes, if `SecretStorageMethod` is **ParameterStore** |
 | FalconClientSecret | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientSecret** | Yes, if `SecretStorageMethod` is **ParameterStore** |
 | Action | Whether to install or uninstall | **Install** | No |
-| LinuxPackageVersion | The Linux version of the package to install. | **N-1** | No |
+| LinuxPackageVersion | The version of the Linux package to install. Example `7.04.17600` installs `N-1` version if no version is provided | **N/a** | No |
 | LinuxInstallerParams | The parameters to pass at install time on Linux nodes. | **N/a** | No |
-| WindowsPackageVersion | The Windows version of the package to install. | **N-1** | No |
+| WindowsPackageVersion | The version of the Windows package to install. Example `7.04.17600` installs `N-1` version if no version is provided. | **N/a** | No |
 | WindowsInstallerParams | The parameters to pass at install time on Windows nodes.| **N/a** | No |
 
 ### Example: Using Systems Manager Associations
