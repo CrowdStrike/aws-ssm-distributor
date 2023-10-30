@@ -8,51 +8,53 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 
 The official distributor package supports the following operating systems:
 
-| Operating System | Architecture |
-| --- | --- |
-| Amazon Linux 1 | x86_64 |
-| Amazon Linux 2 | x86_64, arm64 |
-| Amazon Linux 2023 | x86_64, arm64 |
-| Red Hat Enterprise Linux 6 | x86_64 |
-| Red Hat Enterprise Linux 7 | x86_64 |
-| Red Hat Enterprise Linux 8 | x86_64, arm64 |
-| Red Hat Enterprise Linux 9 | x86_64 |
-| CentOS 6 | x86_64 |
-| CentOS 7 | x86_64 |
-| CentOS 8 | x86_64, arm64 |
-| Oracle Enterprise Linux 6 | x86_64 |
-| Oracle Enterprise Linux 7 | x86_64 |
-| Oracle Enterprise Linux 8 | x86_64 |
-| SUSE Linux Enterprise Server 11 | x86_64 |
-| SUSE Linux Enterprise Server 12 | x86_64 |
-| SUSE Linux Enterprise Server 15 | x86_64 |
-| Ubuntu 16.04 | x86_64 |
-| Ubuntu 18.04 | x86_64, arm64 |
-| Ubuntu 20.04 | x86_64, arm64 |
-| Ubuntu 22.04 | x86_64, arm64 |
-| Debian 9 | x86_64 |
-| Debian 10 | x86_64 |
-| Debian 11 | x86_64
-| All Windows Versions supported by the CrowdStrike Sensor | x86_64 |
+| Operating System                                         | Architecture  |
+| -------------------------------------------------------- | ------------- |
+| Amazon Linux 1                                           | x86_64        |
+| Amazon Linux 2                                           | x86_64, arm64 |
+| Amazon Linux 2023                                        | x86_64, arm64 |
+| Red Hat Enterprise Linux 6                               | x86_64        |
+| Red Hat Enterprise Linux 7                               | x86_64        |
+| Red Hat Enterprise Linux 8                               | x86_64, arm64 |
+| Red Hat Enterprise Linux 9                               | x86_64        |
+| CentOS 6                                                 | x86_64        |
+| CentOS 7                                                 | x86_64        |
+| CentOS 8                                                 | x86_64, arm64 |
+| Oracle Enterprise Linux 6                                | x86_64        |
+| Oracle Enterprise Linux 7                                | x86_64        |
+| Oracle Enterprise Linux 8                                | x86_64        |
+| SUSE Linux Enterprise Server 11                          | x86_64        |
+| SUSE Linux Enterprise Server 12                          | x86_64        |
+| SUSE Linux Enterprise Server 15                          | x86_64        |
+| Ubuntu 16.04                                             | x86_64        |
+| Ubuntu 18.04                                             | x86_64, arm64 |
+| Ubuntu 20.04                                             | x86_64, arm64 |
+| Ubuntu 22.04                                             | x86_64, arm64 |
+| Debian 9                                                 | x86_64        |
+| Debian 10                                                | x86_64        |
+| Debian 11                                                | x86_64        |
+| All Windows Versions supported by the CrowdStrike Sensor | x86_64        |
 
 > Note: For supported Windows versions, check the CrowdStrike documentation.
 
-## Setting up Systems Manager
+## Requirements
+
+### AWS Systems Manager
 Distributor is a feature of AWS Systems Manager. In order to use the distributor package, you must first setup AWS Systems Manager. See the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-setting-up.html) for more information.
 
 A ssm agent version of `2.3.1550.0` or greater is required.
 
-## Generate API Keys
+### Generate API Keys
 
 The distributor package uses the CrowdStrike API to download the sensor onto the target instance. It is highly recommended that you create a dedicated API client for the distributor package.
 
 1. In the CrowdStrike console, navigate to **Support and resources** > **API Clients & Keys**. Click **Add new API Client**.
 2. Add the following api scopes:
 
-    | Scope | Permission | Description |
-    | --- | --- | --- |
-    | Installation Tokens | *READ* | Allows the distributor to pull installation tokens from the CrowdStrike API. |
-    | Sensor Download | *READ* | Allows the distributor to download the sensor from the CrowdStrike API. |
+    | Scope               | Permission | Description                                                                  |
+    | ------------------- | ---------- | ---------------------------------------------------------------------------- |
+    | Installation Tokens | *READ*     | Allows the distributor to pull installation tokens from the CrowdStrike API. |
+    | Sensor Download     | *READ*     | Allows the distributor to download the sensor from the CrowdStrike API.      |
 
 3. Click **Add** to create the API client. The next screen will display the API **CLIENT ID**, **SECRET**, and **BASE URL**. You will need all three for the next step.
 
@@ -66,7 +68,15 @@ The distributor package uses the CrowdStrike API to download the sensor onto the
 
 > Note: This page is only shown once. Make sure you copy **CLIENT ID**, **SECRET**, and **BASE URL** to a secure location.
 
-## Store API Keys in AWS
+## Deploy with Terraform
+
+If you want to use terraform to automate the deployment of this solution check out the [terraform](./terraform) directory.
+
+---
+
+## Manual Deployment
+
+### Store API Keys in AWS
 
 We support both AWS Secrets Manager and AWS Parameter Store as secret backends. Choose which one fits your environment the best.
 
@@ -80,11 +90,11 @@ To use Secrets Manager as your secret backend, you must choose `SecretsManager` 
 
 By default, the automation document looks for a secret named `/CrowdStrike/Falcon/Distributor` with the following key/value pairs:
 
-| Key | Value |
-| --- | --- |
-| ClientId | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |
-| ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). |
-| Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). |
+| Key          | Value                                                           |
+| ------------ | --------------------------------------------------------------- |
+| ClientId     | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |
+| ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys).    |
+| Cloud        | The **BASE URL** from [Generate API Keys](#generate-api-keys).  |
 
 You can use any secret name you like, as long as you pass in the secret name when running the automation document. The keys must match the table above.
 
@@ -141,11 +151,11 @@ You can create the parameters in the AWS console or using the AWS CLI.
 
 The following parameters must be created:
 
-| Default Parameter Name | Parameter Value | Parameter Type |
-| --- | --- | --- |
-| /CrowdStrike/Falcon/Cloud | The **BASE URL** from [Generate API Keys](#generate-api-keys). | SecureString |
-| /CrowdStrike/Falcon/ClientId | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). |SecureString |
-| /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys). | SecureString |
+| Default Parameter Name           | Parameter Value                                                 | Parameter Type |
+| -------------------------------- | --------------------------------------------------------------- | -------------- |
+| /CrowdStrike/Falcon/Cloud        | The **BASE URL** from [Generate API Keys](#generate-api-keys).  | SecureString   |
+| /CrowdStrike/Falcon/ClientId     | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). | SecureString   |
+| /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys).    | SecureString   |
 > **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the association in the next step.
 
 <details><summary>Using the AWS Console</summary>
@@ -193,7 +203,7 @@ aws ssm put-parameter \
 </details>
 
 
-## Create AWS IAM Role
+### Create AWS IAM Role
 
 The distributor package uses an AWS IAM role to assume when running the AWS Systems Manager Automation document. The role is used for the following:
 
@@ -263,7 +273,7 @@ aws iam attach-role-policy \
 ```
 </details>
 
-## Deploying the CrowdStrike Falcon Sensor
+### Deploying the CrowdStrike Falcon Sensor
 
 Once you've completed the above steps you are ready to start deploying the CrowdStrike Falcon Sensor on your SSM manged nodes. You will not execute the distributor package directly. Instead, you will use the published automation document `CrowdStrike-FalconSensorDeploy`.
 
@@ -271,22 +281,22 @@ The automation document generates the necessary parameters that will be passed t
 
 The automation document has the following parameters:
 
-| Parameter Name | Description | Default Value | Required |
-| --- | --- | --- | --- |
-| InstanceIds| The instance IDs of the instances where the sensor will be installed. | **N/a** | Yes |
-| AutomationAssumeRole | The ARN of the role that the automation document will assume. | **N/a** | Yes |
-| SecretStorageMethod | The secret backend to use. Can be **ParameterStore** or **SecretsManager** | **ParameterStore** | Yes |
-| SecretsManagerSecretName | The name of the secret in Secrets Manager. | **/CrowdStrike/Falcon/Distributor** | Yes, if `SecretStorageMethod` is **SecretsManager** |
-| FalconCloud | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/Cloud** | Yes, if `SecretStorageMethod` is **ParameterStore** |
-| FalconClientId | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientId** | Yes, if `SecretStorageMethod` is **ParameterStore** |
-| FalconClientSecret | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientSecret** | Yes, if `SecretStorageMethod` is **ParameterStore** |
-| Action | Whether to install or uninstall | **Install** | No |
-| LinuxPackageVersion | The version of the Linux package to install. Example `7.04.17600` installs `N-1` version if no version is provided | **N/a** | No |
-| LinuxInstallerParams | The parameters to pass at install time on Linux nodes. | **N/a** | No |
-| WindowsPackageVersion | The version of the Windows package to install. Example `7.04.17600` installs `N-1` version if no version is provided. | **N/a** | No |
-| WindowsInstallerParams | The parameters to pass at install time on Windows nodes.| **N/a** | No |
+| Parameter Name           | Description                                                                                                                      | Default Value                        | Required                                            |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------- |
+| InstanceIds              | The instance IDs of the instances where the sensor will be installed.                                                            | **N/a**                              | Yes                                                 |
+| AutomationAssumeRole     | The ARN of the role that the automation document will assume.                                                                    | **N/a**                              | Yes                                                 |
+| SecretStorageMethod      | The secret backend to use. Can be **ParameterStore** or **SecretsManager**                                                       | **ParameterStore**                   | Yes                                                 |
+| SecretsManagerSecretName | The name of the secret in Secrets Manager.                                                                                       | **/CrowdStrike/Falcon/Distributor**  | Yes, if `SecretStorageMethod` is **SecretsManager** |
+| FalconCloud              | AWS SSM Parameter store name used to store **BASE URL** [created in the previous step](#create-aws-parameter-store-parameters).  | **/CrowdStrike/Falcon/Cloud**        | Yes, if `SecretStorageMethod` is **ParameterStore** |
+| FalconClientId           | AWS SSM Parameter store name used to store **CLIENT ID** [created in the previous step](#create-aws-parameter-store-parameters). | **/CrowdStrike/Falcon/ClientId**     | Yes, if `SecretStorageMethod` is **ParameterStore** |
+| FalconClientSecret       | AWS SSM Parameter store name used to store **SECRET** [created in the previous step](#create-aws-parameter-store-parameters).    | **/CrowdStrike/Falcon/ClientSecret** | Yes, if `SecretStorageMethod` is **ParameterStore** |
+| Action                   | Whether to install or uninstall                                                                                                  | **Install**                          | No                                                  |
+| LinuxPackageVersion      | The version of the Linux package to install. Example `7.04.17600` installs `N-1` version if no version is provided               | **N/a**                              | No                                                  |
+| LinuxInstallerParams     | The parameters to pass at install time on Linux nodes.                                                                           | **N/a**                              | No                                                  |
+| WindowsPackageVersion    | The version of the Windows package to install. Example `7.04.17600` installs `N-1` version if no version is provided.            | **N/a**                              | No                                                  |
+| WindowsInstallerParams   | The parameters to pass at install time on Windows nodes.                                                                         | **N/a**                              | No                                                  |
 
-### Example: Using Systems Manager Associations
+#### Example: Using Systems Manager Associations
 
 Using State Manager associations, we can create a single association that will do the following:
 
