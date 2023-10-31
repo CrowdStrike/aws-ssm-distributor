@@ -1,6 +1,6 @@
 # CrowdStrike Falcon Distributor Terraform Module
 
-This terraform code will create a AWS State Manager assocation that will install the CrowdStrike Falcon Sensor on all EC2 instances in a region. The CrowdStrike Falcon Sensor is installed using the Official CrowdStrike Distributor package.
+This terraform code will create an AWS State Manager association that will install the CrowdStrike Falcon Sensor on all EC2 instances in a region. The CrowdStrike Falcon Sensor is installed using the Official CrowdStrike Distributor package.
 
 By default the terraform code will deploy to all regions supported by the Official Distributor package that are enabled on your account.
 
