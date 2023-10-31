@@ -9,7 +9,7 @@ You can target a subset of regions by setting the `aws_regions` variable. You ca
 This terraform module does the following in each region:
 
 - Stores your Falcon API credentials in SSM Parameter Store or Secrets Manager depending on the value of `secret_storage_method`.
-- Creates a IAM Role that allows the automation document to read the Falcon API credentials from SSM Parameter Store or Secrets Manager depending on the value of `secret_storage_method`.
+- Creates an IAM Role that allows the automation document to read the Falcon API credentials from SSM Parameter Store or Secrets Manager depending on the value of `secret_storage_method`.
 - Creates an AWS State Manager association that, by default, runs every 30 minutes and targets every instance in a region. The scheduled occurance can be changed by setting `cron_schedule_expression`.
 
 ## Usage
