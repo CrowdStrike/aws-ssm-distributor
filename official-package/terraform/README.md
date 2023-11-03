@@ -31,6 +31,33 @@ terraform apply --var='falcon_cloud=us-1'
 
 Check out [Inputs](#inputs) for more information on the available variables.
 
+### Example: Set sensor tags and proxy settings
+
+1. Download terraform code located in [this directory](./).
+2. Export your Falcon API credentials as environment variables. Terraform automatically reads any environment variables prefixed with `TF_VAR_` and treats them as input variables. 
+
+```bash
+export TF_VAR_falcon_client_id=...
+export TF_VAR_falcon_client_secret=...
+```
+
+3. Create a file called `terraform.tfvars` and add the following content:
+
+```hcl
+falcon_cloud = "us-1" # Replace with your Falcon Cloud Region
+# setting tags and proxy settings for linux machines
+linux_installer_params = "--tags=\"Washington/DC_USA,Production\" --aph=proxy.example.com --app=8080"
+# setting tags and proxy settings for windows machines
+windows_installer_params = "GROUPING_TAGS=\"Washington/DC_USA,Production\" APP_PROXYNAME=proxy.example.com APP_PROXYPORT=8080" 
+``` 
+
+4. Run the following commands:
+
+```bash
+terraform init
+terraform apply --var-file='terraform.tfvars'
+```
+
 
 ## Providers
 
@@ -43,7 +70,7 @@ Check out [Inputs](#inputs) for more information on the available variables.
 | Name                                    | Description                                                                                                                                      | Type           | Default                              | Required |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- | ------------------------------------ | :------: |
 | aws_regions                             | The AWS Regions to deploy the CrowdStrike Falcon Sensor to. Defaults to every region the Official Distributor supports.                          | `list(string)` | `[]`                                 |    no    |
-| exclude_aws_regions                     | The AWS Regions to exclude from deployment. Defaults to none. Useful for when you want to deploy to most supported regions except a few.                 | `list(string)` | `[]`                                 |    no    |
+| exclude_aws_regions                     | The AWS Regions to exclude from deployment. Defaults to none. Useful for when you want to deploy to most supported regions except a few.         | `list(string)` | `[]`                                 |    no    |
 | falcon_cloud                            | The Falcon Cloud Region to use. One of `us-1, us-2, eu-1`                                                                                        | `string`       | n/a                                  |   yes    |
 | falcon_client_id                        | The Client ID of the Falcon API Credentials                                                                                                      | `string`       | n/a                                  |   yes    |
 | falcon_client_secret                    | The Client Secret of the Falcon API Credentials.                                                                                                 | `string`       | n/a                                  |   yes    |

@@ -297,6 +297,16 @@ The automation document has the following parameters:
 | WindowsPackageVersion    | The version of the Windows package to install. Example `7.04.17600` installs `N-1` version if no version is provided.            | **N/a**                              | No                                                  |
 | WindowsInstallerParams   | The parameters to pass at install time on Windows nodes.                                                                         | **N/a**                              | No                                                  |
 
+> **Note:** To set installation options like sensor tags, proxy settings, etc you will use `LinuxInstallerParams` and `WindowsInstallerParams`. These parameter takes a string of installation options. Check the falcon sensor install documentation in the console for a full list of installation options. For example to set sensor tags and to set proxy settings here are the values you will pass in:
+>
+> ```bash
+> # Linux
+> --tags="Washington/DC_USA,Production" --aph=proxy.example.com --app=8080
+> # Windows
+> GROUPING_TAGS="Washington/DC_USA,Production" APP_PROXYNAME=proxy.example.com APP_PROXYPORT=8080 
+>```
+
+
 #### Example: Using Systems Manager Associations
 
 Using State Manager associations, we can create a single association that will do the following:
