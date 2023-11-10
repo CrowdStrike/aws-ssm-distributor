@@ -9,7 +9,7 @@ locals {
   }
 
   secret_storage_method_mappings = {
-    ssm            = "SSM"
+    ssm            = "ParameterStore"
     secretsmanager = "SecretsManager"
   }
 }
