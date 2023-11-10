@@ -78,7 +78,7 @@ resource "aws_ssm_association" "sensor_deploy" {
 
   parameters = {
     AutomationAssumeRole     = var.ssm_assume_role_arn
-    FalconCloud              = var.falcon_client_id_ssm_parameter_name
+    FalconCloud              = var.falcon_cloud_ssm_parameter_name
     FalconClientId           = var.falcon_client_id_ssm_parameter_name
     FalconClientSecret       = var.falcon_client_secret_ssm_parameter_name
     SecretStorageMethod      = local.secret_storage_method_mappings[local.secret_storage_method]
