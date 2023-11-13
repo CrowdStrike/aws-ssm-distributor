@@ -39,11 +39,11 @@ variable "cron_schedule_expression" {
 variable "secret_storage_method" {
   description = "The method to use for storing the Falcon API credentials. Defaults to SSM."
   type        = string
-  default     = "SSM"
+  default     = "ParameterStore"
 
   validation {
-    condition     = contains(["ssm", "secretsmanager"], lower(var.secret_storage_method))
-    error_message = "Secret Storage Method must be one of SSM or SecretsManager. (case-insensitive)"
+    condition     = contains(["parameterstore", "secretsmanager"], lower(var.secret_storage_method))
+    error_message = "Secret Storage Method must be one of ParameterStore or SecretsManager. (case-insensitive)"
   }
 }
 
