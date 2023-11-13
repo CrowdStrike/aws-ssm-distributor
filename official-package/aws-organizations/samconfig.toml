@@ -1,0 +1,39 @@
+version = 0.1
+[default.global.parameters]
+stack_name = "cs-ssm-distributor"
+s3_bucket="paynecloud-control-tower"
+
+[default.deploy.parameters]
+region = "us-east-1"
+s3_prefix="sam_deploy"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_NAMED_IAM"
+parameter_overrides=[
+
+  # Deployment Scope
+  "ProvisionOU=",
+  "Regions=",
+
+  # Falcon API Credentials
+  "FalconClientID=",
+  "FalconSecret=",
+  "BaseURL=",
+  
+  # Credential Storage Options
+  "SecretStorageMethod=ParameterStore",
+  "SecretsManagerSecretName=/CrowdStrike/Falcon/Distributor",
+  "FalconClientIdParameter=/CrowdStrike/Falcon/ClientId",
+  "FalconSecretParameter=/CrowdStrike/Falcon/ClientSecret",
+  "BaseURLParameter=/CrowdStrike/Falcon/Cloud",
+  
+  # Falcon Distributor Configuration
+  "DocumentVersion=$DEFAULT",
+  "Action=install",
+  "ApplyOnlyAtCronInterval=true",
+  "ScheduleExpression=\"cron(0 0 */1 * * ? *)\"",
+  "AutomationAssumeRole=crowdstrike-distributor-deploy-role",
+  "MaxErrors=10%",
+  "MaxConcurrency=20%",
+  "ComplianceSeverity=UNSPECIFIED"
+
+]

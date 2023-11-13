@@ -1,0 +1,64 @@
+---
+Parameters:
+  AutomationAssumeRole:
+    Type: String
+    Description: 'Name of the IAM role to create'
+  SecretStorageMethod:
+    Type: String
+    Description: 'The method used to store the Falcon ClientId, ClientSecret, and Cloud for the CrowdStrike APIs.'
+    AllowedValues:
+      - 'ParameterStore'
+      - 'SecretsManager'
+  SecretsManagerSecretName:
+    Type: String
+    Description: 'The name of the secret used to store the Falcon ClientId, ClientSecret, and Cloud for the CrowdStrike APIs.'
+  FalconClientID:
+    Description: Your Falcon OAuth2 Client ID.
+    NoEcho: 'true'
+    Type: String
+  FalconSecret:
+    Description: Your Falcon OAuth2 API Secret.
+    NoEcho: 'true'
+    Type: String  
+  BaseURL:
+    Description: Your Falcon OAuth2 API Base URL.
+    Type: String
+  
+Conditions:
+  UseSecretsManager: !Equals [!Ref SecretStorageMethod, 'SecretsManager']
+
+Resources:
+  CrowdStrikeSecrets:
+    Type: AWS::SecretsManager::Secret
+    Condition: UseSecretsManager
+    Properties:
+      Description: CrowdStrike Falcon Credentials for SSM Distributor
+      Name: !Ref SecretsManagerSecretName
+      SecretString:
+        Fn::Join:
+          - ''
+          - - '{"ClientId":"'
+            - Ref: "FalconClientID"
+            - '","ClientSecret":"'
+            - Ref: "FalconSecret"
+            - '","Cloud": "'
+            - Ref: BaseURL
+            - '"}'
+            
+  SSMAutomationRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Ref AutomationAssumeRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'ssm.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole'
+        - !If
+            - UseSecretsManager
+            - 'arn:aws:iam::aws:policy/SecretsManagerReadWrite'
+            - !Ref 'AWS::NoValue'
