@@ -24,6 +24,7 @@ Check out [Parameters](#parameters) for more information on the available variab
 
 | Name                                    | Description                                                                                                                                      | Type           | Default                              | Required |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- | ------------------------------------ | :------: |
+| s3_bucket                             | The AWS S3 Bucket to upload SAM Deployment files.                         | `string` | `[]`                                 |    yes    |
 | Regions                             | The AWS Regions to deploy the CrowdStrike Falcon Sensor to.                         | `list(string)` | `[]`                                 |    yes    |
 | ProvisionOU                     | The AWS Organization OU to deploy the CrowdStrike Falcon Sensor to.  To deploy to the entire organization, provide the root OU (r-****).  Multiple OUs may be provided separated by commas.         | `list(string)` | `[]`                                 |    yes    |
 | FalconClientID                            | The Client Id of the Falcon API Credentials.                                                                                        | `string`       | n/a                                  |   yes    |
