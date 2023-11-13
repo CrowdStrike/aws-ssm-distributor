@@ -9,7 +9,7 @@ locals {
   }
 
   secret_storage_method_mappings = {
-    ssm            = "SSM"
+    parameterstore = "ParameterStore"
     secretsmanager = "SecretsManager"
   }
 }
@@ -39,7 +39,7 @@ EOF
 }
 
 resource "aws_ssm_parameter" "falcon_cloud" {
-  count = local.secret_storage_method == "ssm" ? 1 : 0
+  count = local.secret_storage_method == "parameterstore" ? 1 : 0
 
   name  = var.falcon_cloud_ssm_parameter_name
   type  = "String"
@@ -47,7 +47,7 @@ resource "aws_ssm_parameter" "falcon_cloud" {
 }
 
 resource "aws_ssm_parameter" "falcon_client_id" {
-  count = local.secret_storage_method == "ssm" ? 1 : 0
+  count = local.secret_storage_method == "parameterstore" ? 1 : 0
 
   name  = var.falcon_client_id_ssm_parameter_name
   type  = "SecureString"
@@ -55,7 +55,7 @@ resource "aws_ssm_parameter" "falcon_client_id" {
 }
 
 resource "aws_ssm_parameter" "falcon_client_secret" {
-  count = local.secret_storage_method == "ssm" ? 1 : 0
+  count = local.secret_storage_method == "parameterstore" ? 1 : 0
 
   name  = var.falcon_client_secret_ssm_parameter_name
   type  = "SecureString"
@@ -78,7 +78,7 @@ resource "aws_ssm_association" "sensor_deploy" {
 
   parameters = {
     AutomationAssumeRole     = var.ssm_assume_role_arn
-    FalconCloud              = var.falcon_client_id_ssm_parameter_name
+    FalconCloud              = var.falcon_cloud_ssm_parameter_name
     FalconClientId           = var.falcon_client_id_ssm_parameter_name
     FalconClientSecret       = var.falcon_client_secret_ssm_parameter_name
     SecretStorageMethod      = local.secret_storage_method_mappings[local.secret_storage_method]

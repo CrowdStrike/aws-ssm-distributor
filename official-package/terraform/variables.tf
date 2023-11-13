@@ -1,7 +1,7 @@
 variable "aws_regions" {
   description = "The AWS Regions to deploy the CrowdStrike Falcon Sensor to. Defaults to every region the Official Distributor supports."
   type        = list(string)
-  default = []
+  default     = []
 }
 
 variable "exclude_aws_regions" {
@@ -43,13 +43,13 @@ variable "cron_schedule_expression" {
 
 # Falcon API Credentials Variables 
 variable "secret_storage_method" {
-  description = "The method to use for storing the Falcon API credentials. Defaults to SSM."
+  description = "The method to use for storing the Falcon API credentials. Defaults to ParameterStore."
   type        = string
-  default     = "SSM"
+  default     = "ParameterStore"
 
   validation {
-    condition     = contains(["ssm", "secretsmanager"], lower(var.secret_storage_method))
-    error_message = "Secret Storage Method must be one of SSM or SecretsManager. (case-insensitive)"
+    condition     = contains(["parameterstore", "secretsmanager"], lower(var.secret_storage_method))
+    error_message = "Secret Storage Method must be one of ParameterStore or SecretsManager. (case-insensitive)"
   }
 }
 
