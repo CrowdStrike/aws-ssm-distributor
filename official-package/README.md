@@ -73,6 +73,10 @@ The distributor package uses the CrowdStrike API to download the sensor onto the
 
 If you want to use terraform to automate the deployment of this solution check out the [terraform](./terraform) directory.
 
+## Deploy to AWS Organizations with AWS SAM
+
+If you want to deploy this solution against your entire AWS Organization using AWS SAM the check out the [aws-organizations](./aws-organizations) directory.
+
 ---
 
 ## Manual Deployment
