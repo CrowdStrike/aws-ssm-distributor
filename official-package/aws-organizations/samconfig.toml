@@ -1,7 +1,7 @@
 version = 0.1
 [default.global.parameters]
 stack_name = "cs-ssm-distributor"
-s3_bucket="paynecloud-control-tower"
+s3_bucket=""
 
 [default.deploy.parameters]
 region = "us-east-1"
