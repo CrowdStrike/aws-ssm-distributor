@@ -10,9 +10,11 @@ This deployment provisions the following in each region:
 
 ## Usage
 
-1. Download AWS SAM code located in [this directory](./). 
-2. Review and update the parameter values in [samconfig.toml](./samconfig.toml)
-3. Run the following command:
+1. Install AWS SAM. [AWS SAM Installation Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
+2. Configure AWS CLI with the credentials for your Organization Management account. [AWS CLI Configuration Guide](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
+3. Download the code located in [this directory](./). 
+4. Review and update the parameter values in [samconfig.toml](./samconfig.toml)
+5. Run the following command:
 
 ```bash
 python3 crowdstrike-ssm-distributor-deploy.py
