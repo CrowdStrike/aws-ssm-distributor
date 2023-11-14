@@ -4,28 +4,22 @@ Parameters:
     Description: Your Falcon OAuth2 Client ID.
     NoEcho: 'true'
     Type: String
-    Default: 'test'
   FalconSecret:
     Description: Your Falcon OAuth2 API Secret.
     NoEcho: 'true'
     Type: String
-    Default: 'test'
   BaseURL:
     Description: Your Falcon OAuth2 API Base URL.
     Type: String
-    Default: 'test'
   FalconClientIDParameter:
     Description: Your Falcon OAuth2 Client ID Parameter name.
     Type: String
-    Default: 'test-client'
   FalconSecretParameter:
     Description: Your Falcon OAuth2 API Secret Parameter name.
     Type: String
-    Default: 'test-secret'
   BaseURLParameter:
     Description: Your Falcon OAuth2 API Base URL Parameter name.
     Type: String
-    Default: 'testbase'
 
 Resources:
   LambdaRole:
@@ -40,9 +34,24 @@ Resources:
             Action: sts:AssumeRole
             Condition: { }
       Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ssm:PutParameter'
+                  - 'ssm:DeleteParameter'
+                  - 'ssm:GetParameters'
+                  - 'ssm:GetParameter'
+                  - 'ssm:DeleteParameters'
+                Resource:
+                  - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/${FalconClientIDParameter}'
+                  - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/${FalconSecretParameter}'
+                  - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/${BaseURLParameter}'
       ManagedPolicyArns:
         - !Sub 'arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSSMFullAccess'
 
   TriggerPutParametersLambda:
     Type: 'Custom::TriggerLambda'
@@ -137,6 +146,18 @@ Resources:
                   response_dict['exception'] = e
                   cfnresponse_send(event, FAILED, response_dict, "CustomResourcePhysicalID")
 
+          def delete_parameters(event):
+              ssm = boto3.client('ssm')
+              try:
+                  response = ssm.delete_parameters(
+                      Names=[FALCON_CLIENT_ID_NAME, FALCON_SECRET_NAME, FALCON_CLOUD_NAME]
+                  )
+                  return response
+              except Exception as e:
+                  response_dict={}
+                  response_dict['exception'] = e
+                  cfnresponse_send(event, FAILED, response_dict, "CustomResourcePhysicalID")
+
           def cfnresponse_send(event, responseStatus, responseData, physicalResourceId=None):
               responseUrl = event['ResponseURL']
               print(responseUrl)
@@ -164,14 +185,24 @@ Resources:
               
           def lambda_handler(event, context):
               try:
-                logger.info('Got event {}'.format(event))
-                logger.info('Context {}'.format(context))
-                parameters = put_parameters(event)
-                response_dict={}
-                response_dict['parameters'] = parameters
-                cfnresponse_send(event, SUCCESS, response_dict, "CustomResourcePhysicalID")
+                  logger.info('Got event {}'.format(event))
+                  logger.info('Context {}'.format(context))
+                  if event['RequestType'] in ['Create']:
+                      parameters = put_parameters(event)
+                      response_dict={}
+                      response_dict['parameters'] = parameters
+                      cfnresponse_send(event, SUCCESS, response_dict, "CustomResourcePhysicalID")
+                  elif event['RequestType'] in ['Update']:
+                      parameters = put_parameters(event)
+                      response_dict={}
+                      response_dict['parameters'] = parameters
+                      cfnresponse_send(event, SUCCESS, response_dict, "CustomResourcePhysicalID")
+                  elif event['RequestType'] in ['Delete']:
+                      parameters = delete_parameters(event)
+                      response_dict={}
+                      response_dict['parameters'] = parameters
+                      cfnresponse_send(event, SUCCESS, response_dict, "CustomResourcePhysicalID")
               except Exception as e:
                   response_dict={}
                   response_dict['exception'] = e
                   cfnresponse_send(event, FAILED, response_dict, "CustomResourcePhysicalID")
-

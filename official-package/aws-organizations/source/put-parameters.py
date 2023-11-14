@@ -64,6 +64,18 @@ def put_parameters(event):
         response_dict['exception'] = e
         cfnresponse_send(event, FAILED, response_dict, "CustomResourcePhysicalID")
 
+def delete_parameters(event):
+    ssm = boto3.client('ssm')
+    try:
+        response = ssm.delete_parameters(
+            Names=[FALCON_CLIENT_ID_NAME, FALCON_SECRET_NAME, FALCON_CLOUD_NAME]
+        )
+        return response
+    except Exception as e:
+        response_dict={}
+        response_dict['exception'] = e
+        cfnresponse_send(event, FAILED, response_dict, "CustomResourcePhysicalID")
+
 def cfnresponse_send(event, responseStatus, responseData, physicalResourceId=None):
     responseUrl = event['ResponseURL']
     print(responseUrl)
@@ -90,9 +102,25 @@ def cfnresponse_send(event, responseStatus, responseData, physicalResourceId=Non
         print("send(..) failed executing requests.put(..): " + str(e))
     
 def lambda_handler(event, context):
-    logger.info('Got event {}'.format(event))
-    logger.info('Context {}'.format(context))
-    parameters = put_parameters()
-    response_dict={}
-    response_dict['parameters'] = parameters
-    cfnresponse_send(event, SUCCESS, response_dict, "CustomResourcePhysicalID")
+    try:
+        logger.info('Got event {}'.format(event))
+        logger.info('Context {}'.format(context))
+        if event['RequestType'] in ['Create']:
+            parameters = put_parameters(event)
+            response_dict={}
+            response_dict['parameters'] = parameters
+            cfnresponse_send(event, SUCCESS, response_dict, "CustomResourcePhysicalID")
+        elif event['RequestType'] in ['Update']:
+            parameters = put_parameters(event)
+            response_dict={}
+            response_dict['parameters'] = parameters
+            cfnresponse_send(event, SUCCESS, response_dict, "CustomResourcePhysicalID")
+        elif event['RequestType'] in ['Delete']:
+            parameters = delete_parameters(event)
+            response_dict={}
+            response_dict['parameters'] = parameters
+            cfnresponse_send(event, SUCCESS, response_dict, "CustomResourcePhysicalID")
+    except Exception as e:
+        response_dict={}
+        response_dict['exception'] = e
+        cfnresponse_send(event, FAILED, response_dict, "CustomResourcePhysicalID")
