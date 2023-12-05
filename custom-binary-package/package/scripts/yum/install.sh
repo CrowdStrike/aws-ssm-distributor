@@ -7,7 +7,7 @@ filename="falcon-sensor.rpm"
 rpmInstall() {
   yum install libnl -y
   rpm -ivh "$1"
-  echo "/opt/CrowdStrike/falconctl -s -f --cid=$2 $3" >>log.txt
+  echo "/opt/CrowdStrike/falconctl -s -f --cid=$2 $3"
   /opt/CrowdStrike/falconctl -s -f --cid="$2" $3
   systemctl restart falcon-sensor
   rm $1

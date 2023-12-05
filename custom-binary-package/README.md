@@ -2,8 +2,6 @@
 
 This deployment guide outlines the steps required to build your own distributor package that bundles the CrowdStrike Falcon sensor binaries for Linux and Windows.
 
-This removes the need to use the CrowdStrike API removing the risk of API rate limiting.
-
 ## Requirements
 You will need:
 
@@ -50,71 +48,11 @@ All commands should be ran from the `./custom-binary-package/package` directory.
     ```bash
     cd aws-ssm-distributor/custom-binary-package/package
     ```
-3. Update `agent_list.json` with the operating systems you want to target.
-
-    <details>
-      <summary>Expand for details</summary>
-
-      The `agent_list.json` file should list all the directories that will be included in the package. The file should be in json format and contain a list of objects containing the following keys:
-
-    | Key             | Description                                                                                                                                                                                |
-    | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-    | `dir`           | The directory that contains the install scripts                                                                                                                                            |
-    | `file`          | The name of the zip file that will be created                                                                                                                                              |
-    | `name`          | The `code value` used by SSM Distributor. See [here](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html#what-is-a-package-platforms) for a list of valid values |
-    | `arch_type`     | The architecture type of the binary. See [here](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html#what-is-a-package-platforms) for a list of valid values      |
-    | `major_version` | The major OS version. Must match the exact release version of the operating system Amazon Machine Image (AMI) that you're targeting.                                                       |
-    | `minor_version` | The minor OS version. Must match the exact release version of the operating system Amazon Machine Image (AMI) that you're targeting.                                                       |
-    | `id`            | Optional unique id                                                                                                                                                                         |
-
-    Below is an example `agent_list.json` file that creates a SSM Distributor package that contains install instructions for the following operating systems:
-
-    * Amazon Linux 2
-    * Amazon Linux 2 ARM64
-    * All supported Windows versions
-
-    ```json
-    {
-      "linux": [
-        {
-          "id": "amzn2",
-          "dir": "CS_AMAZON2_x86_64",
-          "file": "CS_AMAZON2_x86_64.zip",
-          "name": "amazon",
-          "major_version": "2",
-          "minor_version": "",
-          "arch_type": "x86_64",
-        },
-        {
-          "id": "amzn2",
-          "dir": "CS_AMAZON2_ARM64",
-          "file": "CS_AMAZON2_arm64.zip",
-          "name": "amazon",
-          "major_version": "2",
-          "minor_version": "",
-          "arch_type": "arm64",
-        }
-      ],
-      "windows": [
-        {
-          "dir": "CS_WINDOWS",
-          "file": "CS_WINDOWS.zip",
-          "id": "windows",
-          "name": "windows",
-          "major_version": "_any",
-          "minor_version": "",
-          "arch_type": "_any",
-        }
-      ]
-    }
-    ```
-    </details>
-
-4. Install the required python modules
+3. Install the required python modules
     ```bash
     pip3 install -r requirements.txt
     ```
-5. Run the `create-package.py` script
+4. Run the `create-package.py` script
 
    This script will download the sensor binaries and create the SSM Distributor package.
 
@@ -145,9 +83,9 @@ You can pass the following parameters to the `additional-arguments` parameter of
 | --------- | ----------- | -------- |
 | SSM_CID | The CID of the CrowdStrike Falcon console to connect to. | Yes |
 | SSM_INSTALLTOKEN | The install token to use when installing the sensor. | No |
-| SSM_WIN_INSTALLPARAMS | The install parameters to use when installing the sensor on Windows. | No |
+| SSM_WIN_INSTALLPARAMS | The install parameters to use when installing the sensor on Windows. (Excluding CID) | No |
 | SSM_WIN_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Windows. | No |
-| SSM_LINUX_INSTALLPARAMS | The install parameters to use when installing the sensor on Linux. | No |
+| SSM_LINUX_INSTALLPARAMS | The install parameters to use when installing the sensor on Linux. (Excluding CID) | No |
 | SSM_LINUX_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Linux. | No |
 
 ### Example
