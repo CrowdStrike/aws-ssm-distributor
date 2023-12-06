@@ -1,6 +1,15 @@
 {
   "linux": [
     {
+      "id": "amzn",
+      "dir": "CS_AMAZON_x86_64",
+      "file": "CS_AMAZON_x86_64.zip",
+      "name": "amazon",
+      "major_version": "1",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
       "id": "amzn2",
       "dir": "CS_AMAZON2_x86_64",
       "file": "CS_AMAZON2_x86_64.zip",
@@ -19,11 +28,174 @@
       "arch_type": "arm64"
     },
     {
+      "id": "amzn2023",
+      "dir": "CS_AMAZON2023_x86_64",
+      "file": "CS_AMAZON2023_x86_64.zip",
+      "name": "amazon",
+      "major_version": "2023",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "id": "amzn2023",
+      "dir": "CS_AMAZON2023_ARM64",
+      "file": "CS_AMAZON2023_ARM64.zip",
+      "name": "amazon",
+      "major_version": "2023",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
       "id": "ubuntu",
       "dir": "CS_UBUNTU_x86_64",
       "file": "CS_UBUNTU_x86_64.zip",
       "name": "ubuntu",
       "major_version": "_any",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_DEBIAN_x86_64",
+      "file": "CS_DEBIAN_x86_64.zip",
+      "name": "debian",
+      "major_version": "_any",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "id": "ubuntu",
+      "dir": "CS_UBUNTU_ARM64",
+      "file": "CS_UBUNTU_ARM64.zip",
+      "name": "ubuntu",
+      "major_version": "_any",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
+      "dir": "CS_RHEL6_x86_64",
+      "file": "CS_RHEL6_x86_64.zip",
+      "name": "redhat",
+      "major_version": "6",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_RHEL7_x86_64",
+      "file": "CS_RHEL7_x86_64.zip",
+      "name": "redhat",
+      "major_version": "7",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_RHEL8_x86_64",
+      "file": "CS_RHEL8_x86_64.zip",
+      "name": "redhat",
+      "major_version": "8",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_RHEL8_ARM64",
+      "file": "CS_RHEL8_ARM64.zip",
+      "name": "redhat",
+      "major_version": "8",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
+      "dir": "CS_RHEL9_x86_64",
+      "file": "CS_RHEL9_x86_64.zip",
+      "name": "redhat",
+      "major_version": "9",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_RHEL9_ARM64",
+      "file": "CS_RHEL9_ARM64.zip",
+      "name": "redhat",
+      "major_version": "9",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
+      "dir": "CS_CENTOS6_x86_64",
+      "file": "CS_CENTOS6_x86_64.zip",
+      "name": "centos",
+      "major_version": "6",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_CENTOS7_x86_64",
+      "file": "CS_CENTOS7_x86_64.zip",
+      "name": "centos",
+      "major_version": "7",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_CENTOS8_x86_64",
+      "file": "CS_CENTOS8_x86_64.zip",
+      "name": "centos",
+      "major_version": "8",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_CENTOS8_ARM64",
+      "file": "CS_CENTOS8_ARM64.zip",
+      "name": "centos",
+      "major_version": "8",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
+      "dir": "CS_ORACLE6_x86_64",
+      "file": "CS_ORACLE6_x86_64.zip",
+      "name": "oracle",
+      "major_version": "6",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_ORACLE7_x86_64",
+      "file": "CS_ORACLE7_x86_64.zip",
+      "name": "oracle",
+      "major_version": "7",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_ORACLE8_x86_64",
+      "file": "CS_ORACLE8_x86_64.zip",
+      "name": "oracle",
+      "major_version": "8",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_SLES11_x86_64",
+      "file": "CS_SLES11_x86_64.zip",
+      "name": "suse",
+      "major_version": "11",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_SLES12_x86_64",
+      "file": "CS_SLES12_x86_64.zip",
+      "name": "suse",
+      "major_version": "12",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_SLES15_x86_64",
+      "file": "CS_SLES15_x86_64.zip",
+      "name": "suse",
+      "major_version": "15",
       "minor_version": "",
       "arch_type": "x86_64"
     }
