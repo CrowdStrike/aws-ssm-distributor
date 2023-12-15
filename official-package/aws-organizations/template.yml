@@ -103,14 +103,11 @@ Parameters:
     Description: The method used to store the FalconClientId, FalconClientSecret, and FalconCloud for the CrowdStrike APIs.
     Type: String
     AllowedValues: [ "ParameterStore", "SecretsManager"]
-    Default: 'ParameterStore'
+    Default: 'SecretsManager'
   SecretsManagerSecretName:
     Description: Secrets Manager Secret Name that contains the Falcon ClientId, ClientSecret, and Cloud for the CrowdStrike APIs. Required if SecretStorageMethod is SecretsManager.
     Type: String
     Default: '/crowdstrike/falcon/distributor'
-
-Conditions:
-  PutParameters:  !Equals [!Ref 'SecretStorageMethod', 'ParameterStore']
 
 Resources:
   SSMSetupStackSet:
@@ -193,38 +190,3 @@ Resources:
               - !Ref ProvisionOU
           Regions: !Ref Regions
       TemplateURL: ssm-association-stackset.yml
-
-  PutParametersStackSet:
-    Type: 'AWS::CloudFormation::StackSet'
-    Condition: PutParameters
-    Properties:
-      StackSetName: crowdstrike-ssm-parameters
-      Description: Create SSM Paramaters to store Falcon Credentials
-      Capabilities:
-       - CAPABILITY_NAMED_IAM
-      PermissionModel: SERVICE_MANAGED
-      ManagedExecution:
-        Active: true
-      Parameters:
-        - ParameterKey: FalconClientID
-          ParameterValue: !Ref FalconClientID
-        - ParameterKey: FalconSecret
-          ParameterValue: !Ref FalconSecret
-        - ParameterKey: BaseURL
-          ParameterValue: !Ref BaseURL
-        - ParameterKey: FalconClientIDParameter
-          ParameterValue: !Ref FalconClientIDParameter
-        - ParameterKey: FalconSecretParameter
-          ParameterValue: !Ref FalconSecretParameter
-        - ParameterKey: BaseURLParameter
-          ParameterValue: !Ref BaseURLParameter
-      AutoDeployment:
-        Enabled: true
-        RetainStacksOnAccountRemoval: true
-      StackInstancesGroup:
-        - DeploymentTargets:
-            AccountFilterType: NONE
-            OrganizationalUnitIds: 
-              - !Ref ProvisionOU
-          Regions: !Ref Regions
-      TemplateURL: put-parameters-stackset.yml
