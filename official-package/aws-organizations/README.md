@@ -14,10 +14,17 @@ This deployment provisions the following in each region:
 2. Configure AWS CLI with the credentials for your Organization Management account. [AWS CLI Configuration Guide](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
 3. Download the code located in [this directory](./). 
 4. Review and update the parameter values in [samconfig.toml](./samconfig.toml)
-5. Run the following command:
+5. Run the following commands:
 
 ```bash
-python3 crowdstrike-ssm-distributor-deploy.py
+# Build
+build --config-file samconfig.toml 
+
+# Deploy:
+deploy --config-file samconfig.toml
+
+# Delete:
+delete --config-file samconfig.toml
 ```
 
 Check out [Parameters](#parameters) for more information on the available variables.
