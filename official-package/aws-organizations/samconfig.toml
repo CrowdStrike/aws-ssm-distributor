@@ -40,4 +40,10 @@ parameter_overrides=[
   "MaxConcurrency=20%",
   "ComplianceSeverity=UNSPECIFIED"
 
+  # Additional Options
+  # "LinuxPackageVersion=",
+  # "LinuxInstallerParams=",
+  # "WindowsPackageVersion=",
+  # "WindowsInstallerParams=",
+
 ]

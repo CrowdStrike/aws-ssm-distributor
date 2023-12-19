@@ -48,6 +48,24 @@ Parameters:
   BaseURLParameter:
     Description: Parameter name that stores the Base URL for your Falcon API Client
     Type: String
+  LinuxInstallerParams:
+    Type: String
+    Default: ''
+  WindowsInstallerParams:
+    Type: String
+    Default: ''
+  LinuxPackageVersion:
+    Type: String
+    Default: ''
+  WindowsPackageVersion:
+    Type: String
+    Default: ''
+
+Conditions:
+  SetLinuxInstallerParams: !Not [ !Equals [ !Ref LinuxInstallerParams, '' ] ]
+  SetWindowsInstallerParams: !Not [ !Equals [ !Ref WindowsInstallerParams, '' ] ]
+  SetLinuxPackageVersion: !Not [ !Equals [ !Ref LinuxPackageVersion, '' ] ]
+  SetWindowsPackageVersion: !Not [ !Equals [ !Ref WindowsPackageVersion, '' ] ]
 
 Resources:
   CrowdStrikeSSMAssociation:
@@ -75,6 +93,26 @@ Resources:
         - !Ref FalconClientIDParameter
         FalconClientSecret:
         - !Ref FalconSecretParameter
+        LinuxInstallerParams:
+        - Fn::If:
+          - SetLinuxInstallerParams
+          - !Ref LinuxInstallerParams
+          - Ref: AWS::NoValue
+        WindowsInstallerParams:
+        - Fn::If:
+          - SetWindowsInstallerParams
+          - !Ref WindowsInstallerParams
+          - Ref: AWS::NoValue
+        LinuxPackageVersion:
+        - Fn::If:
+          - SetLinuxPackageVersion
+          - !Ref LinuxPackageVersion
+          - Ref: AWS::NoValue
+        WindowsPackageVersion:
+        - Fn::If:
+          - SetWindowsPackageVersion
+          - !Ref WindowsPackageVersion
+          - Ref: AWS::NoValue
       MaxConcurrency: !Ref MaxConcurrency
       MaxErrors: !Ref MaxErrors
       ApplyOnlyAtCronInterval: !Ref ApplyOnlyAtCronInterval

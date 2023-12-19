@@ -108,6 +108,18 @@ Parameters:
     Description: Secrets Manager Secret Name that contains the Falcon ClientId, ClientSecret, and Cloud for the CrowdStrike APIs. Required if SecretStorageMethod is SecretsManager.
     Type: String
     Default: '/crowdstrike/falcon/distributor'
+  LinuxInstallerParams:
+    Type: String
+    Default: ''
+  WindowsInstallerParams:
+    Type: String
+    Default: ''
+  LinuxPackageVersion:
+    Type: String
+    Default: ''
+  WindowsPackageVersion:
+    Type: String
+    Default: ''
 
 Resources:
   SSMSetupStackSet:
@@ -180,6 +192,14 @@ Resources:
           ParameterValue: !Ref ApplyOnlyAtCronInterval
         - ParameterKey: ComplianceSeverity
           ParameterValue: !Ref ComplianceSeverity
+        - ParameterKey: LinuxInstallerParams
+          ParameterValue: !Ref LinuxInstallerParams
+        - ParameterKey: WindowsInstallerParams
+          ParameterValue: !Ref WindowsInstallerParams
+        - ParameterKey: LinuxPackageVersion
+          ParameterValue: !Ref LinuxPackageVersion
+        - ParameterKey: WindowsPackageVersion
+          ParameterValue: !Ref WindowsPackageVersion
       AutoDeployment:
         Enabled: true
         RetainStacksOnAccountRemoval: true
