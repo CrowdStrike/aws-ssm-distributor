@@ -1,0 +1,212 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CrowdStrike Falcon SSM Distributor for AWS Organizations
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Deployment Scope
+        Parameters:
+          - ProvisionOU
+          - Regions
+      - Label:
+          default: Falcon API Credentials
+        Parameters:
+          - FalconClientID
+          - FalconSecret
+          - FalconCloud
+      - Label:
+          default: Credential Storage Options
+        Parameters:
+          - SecretStorageMethod
+          - SecretsManagerSecretName
+          - FalconClientIdParameter
+          - FalconSecretParameter
+          - FalconCloudParameter
+      - Label:
+          default: Falcon Distributor Configuration
+        Parameters:
+          - AutomationAssumeRole
+          - ProvisionOU
+          - Action
+          - ScheduleExpression
+          - MaxErrors
+          - MaxConcurrency
+        
+Parameters:
+  Regions:
+    Type: CommaDelimitedList
+  ProvisionOU:
+    Type: String
+  FalconClientID:
+    Description: Your Falcon OAuth2 Client ID.
+    NoEcho: 'true'
+    Type: String
+  FalconSecret:
+    Description: Your Falcon OAuth2 API Secret.
+    NoEcho: 'true'
+    Type: String
+  BaseURL:
+    Description: Base URL for your Falcon API Client
+    Type: String
+  FalconClientIDParameter:
+    Description: Parameter name that stores your Falcon OAuth2 Client ID.
+    NoEcho: 'true'
+    Type: String
+    Default: /CrowdStrike/Falcon/ClientId
+  FalconSecretParameter:
+    Description: Parameter name that stores your Falcon OAuth2 API Secret.
+    NoEcho: 'true'
+    Type: String
+    Default: /CrowdStrike/Falcon/ClientSecret
+  BaseURLParameter:
+    Description: Parameter name that stores the Base URL for your Falcon API Client
+    Type: String
+    Default: /CrowdStrike/Falcon/Cloud
+  AutomationAssumeRole:
+    Type: String
+    Default: 'crowdstrike-distributor-deploy-role'
+    Description: 'Execution Role for CrowdStrike SSM Distributor Package'
+  ApplyOnlyAtCronInterval:
+    Description: By default, when you create a new association, the system runs it immediately after it is created and then according to the schedule you specified. Specify true if you don't want an association to run immediately after you create it. .
+    Type: String
+    Default: 'false'
+  ComplianceSeverity:
+    Description: The severity level that is assigned to the association
+    Type: String
+    Default: 'UNSPECIFIED'
+    AllowedValues: [ "CRITICAL", "HIGH", "LOW", "MEDIUM", "UNSPECIFIED"]
+  DocumentVersion:
+    Description: The version of the SSM document to associate with the target.
+    Type: String
+    AllowedPattern: '([$]LATEST|[$]DEFAULT|^[1-9][0-9]*$)'
+    Default: '$DEFAULT'
+  ScheduleExpression:
+    Description: A cron expression that specifies a schedule when the association runs. The schedule runs in Coordinated Universal Time (UTC).
+    Type: String
+    Default: 'cron(0 8 ? * MON *)'
+  MaxErrors:
+    Description: The number of errors that are allowed before the system stops sending requests to run the association on additional targets. You can specify either an absolute number of errors, for example 10, or a percentage of the target set, for example 10%.
+    Type: String
+    Default: '10%'
+  MaxConcurrency:
+    Description: The maximum number of targets allowed to run the association at the same time. You can specify a number, for example 10, or a percentage of the target set, for example 10%. The default value is 100%, which means all targets run the association at the same time.
+    Type: String
+    Default: '20%'
+  Action:
+    Description: Specify whether or not to install or uninstall the package.
+    Type: String
+    Default: 'install'
+    AllowedValues: [ "install", "uninstall"]
+  SecretStorageMethod:
+    Description: The method used to store the FalconClientId, FalconClientSecret, and FalconCloud for the CrowdStrike APIs.
+    Type: String
+    AllowedValues: [ "ParameterStore", "SecretsManager"]
+    Default: 'SecretsManager'
+  SecretsManagerSecretName:
+    Description: Secrets Manager Secret Name that contains the Falcon ClientId, ClientSecret, and Cloud for the CrowdStrike APIs. Required if SecretStorageMethod is SecretsManager.
+    Type: String
+    Default: '/crowdstrike/falcon/distributor'
+  LinuxInstallerParams:
+    Type: String
+    Default: ''
+  WindowsInstallerParams:
+    Type: String
+    Default: ''
+  LinuxPackageVersion:
+    Type: String
+    Default: ''
+  WindowsPackageVersion:
+    Type: String
+    Default: ''
+
+Resources:
+  SSMSetupStackSet:
+    Type: 'AWS::CloudFormation::StackSet'
+    Properties:
+      StackSetName: crowdstrike-ssm-role
+      Description: Securely store Falcon credentials and create AWS IAM role to assume when running the AWS Systems Manager Automation document.
+      Capabilities:
+       - CAPABILITY_NAMED_IAM
+      PermissionModel: SERVICE_MANAGED
+      ManagedExecution:
+        Active: true
+      Parameters:
+        - ParameterKey: SecretStorageMethod
+          ParameterValue: !Ref SecretStorageMethod
+        - ParameterKey: SecretsManagerSecretName
+          ParameterValue: !Ref SecretsManagerSecretName
+        - ParameterKey: AutomationAssumeRole
+          ParameterValue: !Ref AutomationAssumeRole
+        - ParameterKey: FalconClientID
+          ParameterValue: !Ref FalconClientID
+        - ParameterKey: FalconSecret
+          ParameterValue: !Ref FalconSecret
+        - ParameterKey: BaseURL
+          ParameterValue: !Ref BaseURL
+      AutoDeployment:
+        Enabled: true
+        RetainStacksOnAccountRemoval: true
+      StackInstancesGroup:
+        - DeploymentTargets:
+            AccountFilterType: NONE
+            OrganizationalUnitIds: 
+              - !Ref ProvisionOU
+          Regions: 
+            - !Ref AWS::Region
+      TemplateURL: ssm-setup-stackset.yml
+
+  AutoAssociationStackSet:
+    Type: 'AWS::CloudFormation::StackSet'
+    Properties:
+      StackSetName: crowdstrike-ssm-association
+      Description: Create SSM State Manager Association to automatically manage Falcon Sensor installation across SSM Managed Instances
+      PermissionModel: SERVICE_MANAGED
+      ManagedExecution:
+        Active: true
+      Parameters:
+        - ParameterKey: SecretsManagerSecretName
+          ParameterValue: !Ref SecretsManagerSecretName
+        - ParameterKey: SecretStorageMethod
+          ParameterValue: !Ref SecretStorageMethod
+        - ParameterKey: Action
+          ParameterValue: !Ref Action
+        - ParameterKey: ScheduleExpression
+          ParameterValue: !Ref ScheduleExpression
+        - ParameterKey: MaxErrors
+          ParameterValue: !Ref MaxErrors
+        - ParameterKey: MaxConcurrency
+          ParameterValue: !Ref MaxConcurrency
+        - ParameterKey: FalconClientIDParameter
+          ParameterValue: !Ref FalconClientIDParameter
+        - ParameterKey: FalconSecretParameter
+          ParameterValue: !Ref FalconSecretParameter
+        - ParameterKey: BaseURLParameter
+          ParameterValue: !Ref BaseURLParameter
+        - ParameterKey: DocumentVersion
+          ParameterValue: !Ref DocumentVersion
+        - ParameterKey: AutomationAssumeRole
+          ParameterValue: !Ref AutomationAssumeRole
+        - ParameterKey: ApplyOnlyAtCronInterval
+          ParameterValue: !Ref ApplyOnlyAtCronInterval
+        - ParameterKey: ComplianceSeverity
+          ParameterValue: !Ref ComplianceSeverity
+        - ParameterKey: LinuxInstallerParams
+          ParameterValue: !Ref LinuxInstallerParams
+        - ParameterKey: WindowsInstallerParams
+          ParameterValue: !Ref WindowsInstallerParams
+        - ParameterKey: LinuxPackageVersion
+          ParameterValue: !Ref LinuxPackageVersion
+        - ParameterKey: WindowsPackageVersion
+          ParameterValue: !Ref WindowsPackageVersion
+      AutoDeployment:
+        Enabled: true
+        RetainStacksOnAccountRemoval: true
+      StackInstancesGroup:
+        - DeploymentTargets:
+            AccountFilterType: NONE
+            OrganizationalUnitIds: 
+              - !Ref ProvisionOU
+          Regions: !Ref Regions
+      TemplateURL: ssm-association-stackset.yml

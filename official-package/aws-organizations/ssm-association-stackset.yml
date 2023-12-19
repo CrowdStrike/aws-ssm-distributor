@@ -1,0 +1,128 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Association for CrowdStrike Falcon SSM Distributor
+
+Parameters:
+  AutomationAssumeRole:
+    Description: Execution Role for CrowdStrike SSM Distributor Package.
+    Type: String
+  Action:
+    Description: Specify whether or not to install or uninstall the package.
+    Type: String
+    AllowedValues: [ "install", "uninstall"]
+  SecretStorageMethod:
+    Description: The method used to store the FalconClientId, FalconClientSecret, and FalconCloud for the CrowdStrike APIs.
+    Type: String
+    AllowedValues: [ "ParameterStore", "SecretsManager"]
+  SecretsManagerSecretName:
+    Description: Secrets Manager Secret Name that contains the Falcon ClientId, ClientSecret, and Cloud for the CrowdStrike APIs. Required if SecretStorageMethod is SecretsManager.
+    Type: String
+  DocumentVersion:
+    Description: The version of the SSM document to associate with the target.
+    Type: String
+    AllowedPattern: '([$]LATEST|[$]DEFAULT|^[1-9][0-9]*$)'
+  ApplyOnlyAtCronInterval:
+    Description: By default, when you create a new association, the system runs it immediately after it is created and then according to the schedule you specified. Specify true if you don't want an association to run immediately after you create it. .
+    Type: String
+  ComplianceSeverity:
+    Description: The severity level that is assigned to the association
+    Type: String
+    AllowedValues: [ "CRITICAL", "HIGH", "LOW", "MEDIUM", "UNSPECIFIED"]
+  ScheduleExpression:
+    Description: A cron expression that specifies a schedule when the association runs. The schedule runs in Coordinated Universal Time (UTC).
+    Type: String
+  MaxErrors:
+    Description: The number of errors that are allowed before the system stops sending requests to run the association on additional targets. You can specify either an absolute number of errors, for example 10, or a percentage of the target set, for example 10%.
+    Type: String
+  MaxConcurrency:
+    Description: The maximum number of targets allowed to run the association at the same time. You can specify a number, for example 10, or a percentage of the target set, for example 10%. The default value is 100%, which means all targets run the association at the same time.
+    Type: String
+  FalconClientIDParameter:
+    Description: Parameter name that stores your Falcon OAuth2 Client ID.
+    NoEcho: 'true'
+    Type: String
+  FalconSecretParameter:
+    Description: Parameter name that stores your Falcon OAuth2 API Secret.
+    NoEcho: 'true'
+    Type: String
+  BaseURLParameter:
+    Description: Parameter name that stores the Base URL for your Falcon API Client
+    Type: String
+  LinuxInstallerParams:
+    Type: String
+    Default: ''
+  WindowsInstallerParams:
+    Type: String
+    Default: ''
+  LinuxPackageVersion:
+    Type: String
+    Default: ''
+  WindowsPackageVersion:
+    Type: String
+    Default: ''
+
+Conditions:
+  SetLinuxInstallerParams: !Not [ !Equals [ !Ref LinuxInstallerParams, '' ] ]
+  SetWindowsInstallerParams: !Not [ !Equals [ !Ref WindowsInstallerParams, '' ] ]
+  SetLinuxPackageVersion: !Not [ !Equals [ !Ref LinuxPackageVersion, '' ] ]
+  SetWindowsPackageVersion: !Not [ !Equals [ !Ref WindowsPackageVersion, '' ] ]
+
+Resources:
+  CrowdStrikeSSMAssociation:
+    Type: AWS::SSM::Association
+    Properties: 
+      Name: 'CrowdStrike-FalconSensorDeploy'
+      AssociationName: 'crowdstrike-falcon-sensor-deploy'
+      AutomationTargetParameterName: 'InstanceIds'
+      Targets:
+        - Key: InstanceIds
+          Values:
+            - '*'
+      Parameters:
+        AutomationAssumeRole:
+        - !Sub arn:aws:iam::${AWS::AccountId}:role/${AutomationAssumeRole}
+        Action:
+        - !Ref Action
+        SecretStorageMethod:
+        - !Ref SecretStorageMethod
+        SecretsManagerSecretName:
+        - !Ref SecretsManagerSecretName
+        FalconCloud:
+        - !Ref BaseURLParameter
+        FalconClientId:
+        - !Ref FalconClientIDParameter
+        FalconClientSecret:
+        - !Ref FalconSecretParameter
+        LinuxInstallerParams:
+        - Fn::If:
+          - SetLinuxInstallerParams
+          - !Ref LinuxInstallerParams
+          - Ref: AWS::NoValue
+        WindowsInstallerParams:
+        - Fn::If:
+          - SetWindowsInstallerParams
+          - !Ref WindowsInstallerParams
+          - Ref: AWS::NoValue
+        LinuxPackageVersion:
+        - Fn::If:
+          - SetLinuxPackageVersion
+          - !Ref LinuxPackageVersion
+          - Ref: AWS::NoValue
+        WindowsPackageVersion:
+        - Fn::If:
+          - SetWindowsPackageVersion
+          - !Ref WindowsPackageVersion
+          - Ref: AWS::NoValue
+      MaxConcurrency: !Ref MaxConcurrency
+      MaxErrors: !Ref MaxErrors
+      ApplyOnlyAtCronInterval: !Ref ApplyOnlyAtCronInterval
+      ComplianceSeverity: !Ref ComplianceSeverity
+      ScheduleExpression: !Ref ScheduleExpression
+      DocumentVersion: !Ref DocumentVersion
+      # ScheduleOffset: !Ref ScheduleOffset
+      # SyncCompliance: 'AUTO'
+      # InstanceId: String
+      # CalendarNames: 
+      #   - String
+      # OutputLocation: InstanceAssociationOutputLocation
+      # WaitForSuccessTimeoutSeconds: Integer

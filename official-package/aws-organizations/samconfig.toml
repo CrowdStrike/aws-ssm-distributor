@@ -1,0 +1,49 @@
+version = 0.1
+[default.global.parameters]
+stack_name = "cs-ssm-distributor"
+s3_bucket=""
+
+[default.deploy.parameters]
+region = ""
+s3_prefix="sam_deploy"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM CAPABILITY_NAMED_IAM"
+parameter_overrides=[
+
+  # Deployment Scope
+  "ProvisionOU=",
+  "Regions=",
+
+  # Falcon API Credentials
+  "FalconClientID=",
+  "FalconSecret=",
+  "BaseURL=",
+  
+  # Credential Storage Options
+  "SecretsManagerSecretName=/CrowdStrike/Falcon/Distributor",
+
+  # By default this template stores Falcon API Credentials in Secrets Manager
+  # Uncomment the variables below to source Falcon API Credentials from Parameter Store 
+  # Note this option requires you to create the parameters before running this template, please see README for more info.
+  # "SecretStorageMethod=ParameterStore",
+  # "FalconClientIdParameter=/CrowdStrike/Falcon/ClientId",
+  # "FalconSecretParameter=/CrowdStrike/Falcon/ClientSecret",
+  # "BaseURLParameter=/CrowdStrike/Falcon/Cloud",
+  
+  # Falcon Distributor Configuration
+  "DocumentVersion=$DEFAULT",
+  "Action=install",
+  "ApplyOnlyAtCronInterval=true",
+  "ScheduleExpression=\"cron(0 0 */1 * * ? *)\"",
+  "AutomationAssumeRole=crowdstrike-distributor-deploy-role",
+  "MaxErrors=10%",
+  "MaxConcurrency=20%",
+  "ComplianceSeverity=UNSPECIFIED"
+
+  # Additional Options
+  # "LinuxPackageVersion=",
+  # "LinuxInstallerParams=",
+  # "WindowsPackageVersion=",
+  # "WindowsInstallerParams=",
+
+]
