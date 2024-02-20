@@ -317,7 +317,6 @@ Using State Manager associations, we can create a single association that will d
 
 - Install the CrowdStrike Falcon sensor on all instances (Windows and Linux) within the region
 - Run on a schedule to ensure the sensor is always present on every instance
-- Install the sensor on newly created machines automatically
 
 For more information on State Manager, see the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-state-about.html).
 
