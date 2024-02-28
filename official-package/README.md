@@ -234,8 +234,6 @@ curl -s -o ./iam-role.yaml "https://raw.githubusercontent.com/crowdstrike/aws-ss
 
 If you want to use Secrets Manager as the secret backend, replace `ParameterStore` with `SecretsManager`.
 
-```bash
-
 </details>
 
 <details> <summary>Using the AWS CLI</summary>
