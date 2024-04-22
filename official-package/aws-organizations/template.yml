@@ -38,7 +38,7 @@ Parameters:
   Regions:
     Type: CommaDelimitedList
   ProvisionOU:
-    Type: String
+    Type: CommaDelimitedList
   FalconClientID:
     Description: Your Falcon OAuth2 Client ID.
     NoEcho: 'true'
@@ -151,8 +151,7 @@ Resources:
       StackInstancesGroup:
         - DeploymentTargets:
             AccountFilterType: NONE
-            OrganizationalUnitIds: 
-              - !Ref ProvisionOU
+            OrganizationalUnitIds: !Ref ProvisionOU
           Regions: 
             - !Ref AWS::Region
       TemplateURL: ssm-setup-stackset.yml
@@ -206,7 +205,6 @@ Resources:
       StackInstancesGroup:
         - DeploymentTargets:
             AccountFilterType: NONE
-            OrganizationalUnitIds: 
-              - !Ref ProvisionOU
+            OrganizationalUnitIds: !Ref ProvisionOU
           Regions: !Ref Regions
       TemplateURL: ssm-association-stackset.yml
