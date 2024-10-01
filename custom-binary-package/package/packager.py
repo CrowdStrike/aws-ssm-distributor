@@ -3,6 +3,7 @@
 This example demonstrates creating a bundled Falcon Sensor
 distributor package within AWS Systems Manager.
 """
+
 import argparse
 import hashlib
 import json
@@ -208,9 +209,12 @@ class DistributorPackager:  # pylint: disable=R0903
                 dirs.add(installer["dir"])
                 file_list.add(installer["file"])
 
-        folders_exist = all(item in dir_list for item in dirs)
-        if not folders_exist:
-            print("Check agent list file - Required directories do not exist")
+        missing_dirs = dirs - set(dir_list)
+
+        if len(missing_dirs) > 0:
+            print(
+                f"Missing directories: {missing_dirs} - this is caused by agent_list.json expecting a package to exist. If you modified the scripts this could mean something went wrong. Please report the issue on our github page."
+            )
             sys.exit(1)
         for directory in dirs:
             self._create_zip_files(directory)

@@ -61,11 +61,6 @@ print("Downloading required files...")
 
 binary_list = [
     {
-        "filter": "os:'Amazon Linux'+os_version:'1'+platform:'linux'",
-        "path": "CS_AMAZON_x86_64/falcon-sensor.rpm",
-        "installer": "yum",
-    },
-    {
         "filter": "os:'Amazon Linux'+os_version:'2'+platform:'linux'",
         "path": "CS_AMAZON2_x86_64/falcon-sensor.rpm",
         "installer": "yum",
@@ -83,11 +78,6 @@ binary_list = [
     {
         "filter": "os:'Amazon Linux'+os_version:'2023 - arm64'+platform:'linux'",
         "path": "CS_AMAZON2023_ARM64/falcon-sensor.rpm",
-        "installer": "yum",
-    },
-    {
-        "filter": "os:'*RHEL*'+os_version:'6'+platform:'linux'",
-        "path": "CS_RHEL6_x86_64/falcon-sensor.rpm",
         "installer": "yum",
     },
     {
@@ -113,11 +103,6 @@ binary_list = [
     {
         "filter": "os:'*RHEL*'+os_version:'9 - arm64'+platform:'linux'",
         "path": "CS_RHEL9_ARM64/falcon-sensor.rpm",
-        "installer": "yum",
-    },
-    {
-        "filter": "os:'*CentOS*'+os_version:'6'+platform:'linux'",
-        "path": "CS_CENTOS6_x86_64/falcon-sensor.rpm",
         "installer": "yum",
     },
     {
@@ -149,11 +134,6 @@ binary_list = [
         "path": "CS_ORACLE8_x86_64/falcon-sensor.rpm",
         "installer": "yum",
         "filter": "os:'*Oracle*'+os_version:'8'+platform:'linux'",
-    },
-    {
-        "path": "CS_SLES11_x86_64/falcon-sensor.rpm",
-        "installer": "zypper",
-        "filter": "os:'*SLES*'+os_version:'11'+platform:'linux'",
     },
     {
         "path": "CS_SLES12_x86_64/falcon-sensor.rpm",
@@ -199,7 +179,9 @@ for binary in binary_list:
     )
     resources = sensors["body"].get("resources", [])
     if len(resources) == 0:
-        raise SystemExit(f"Unable to find sensor that matches filter: {binary['filter']}")
+        raise SystemExit(
+            f"Unable to find sensor that matches filter: {binary['filter']}"
+        )
     if len(resources) > 1:
         sensor = resources[1]
     else:
