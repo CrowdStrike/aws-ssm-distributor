@@ -9,7 +9,7 @@ Parameters:
   Action:
     Description: Specify whether or not to install or uninstall the package.
     Type: String
-    AllowedValues: [ "install", "uninstall"]
+    AllowedValues: [ "Install", "Uninstall"]
   SecretStorageMethod:
     Description: The method used to store the FalconClientId, FalconClientSecret, and FalconCloud for the CrowdStrike APIs.
     Type: String
