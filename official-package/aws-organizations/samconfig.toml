@@ -32,7 +32,7 @@ parameter_overrides=[
   
   # Falcon Distributor Configuration
   "DocumentVersion=$DEFAULT",
-  "Action=install",
+  "Action=Install",
   "ApplyOnlyAtCronInterval=true",
   "ScheduleExpression=\"cron(0 0 */1 * * ? *)\"",
   "AutomationAssumeRole=crowdstrike-distributor-deploy-role",
