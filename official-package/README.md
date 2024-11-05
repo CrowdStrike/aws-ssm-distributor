@@ -6,6 +6,12 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 
 ## Supported Operating Systems
 
+> [!IMPORTANT] 
+> This list below shows what operating systems the official distributor package supports. It is not a list of supported CrowdStrike sensors.
+
+> [!WARNING]
+> Not all CrowdStrike supported sensors are supported by AWS SSM. See [AWS supported operating systems](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html#:~:text=platforms%20and%20architectures.-,Supported%20package%20platforms%20and%20architectures,-You%20can%20use) for more information.
+
 The official distributor package supports the following operating systems:
 
 | Operating System                                         | Architecture  |
@@ -35,7 +41,8 @@ The official distributor package supports the following operating systems:
 | Debian 11                                                | x86_64        |
 | All Windows Versions supported by the CrowdStrike Sensor | x86_64        |
 
-> Note: For supported Windows versions, check the CrowdStrike documentation.
+> [!NOTE]
+> For supported Windows versions, check the CrowdStrike documentation.
 
 ## Requirements
 
