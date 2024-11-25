@@ -458,4 +458,5 @@ The `CrowdStrike-FalconSensorDeploy` automation document can be found in the AWS
 
 > [!NOTE]
 > The `v3` of the `CrowdStrike-FalconSensorDeploy` removed conditional actions due to the switch to the consolidated distributor package. 
+
 The `CrowdStrike-FalconSensorDeploy` automation document contains conditional actions that will only run if certain conditions are met. If a steps conditions are not met they will stay in a `Pending` state. You can read more about [automation statuses here](https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-statuses.html).
