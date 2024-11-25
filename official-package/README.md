@@ -1,5 +1,10 @@
 # Official AWS Distributor Package
 
+> [!IMPORTANT]
+> AWS is decomissioning Python 3.8 which is currently used in `v1` and `v2` of the automation document used in our Official AWS Distributor Package.
+> Please ensure you are using version `3` of the automation document to prevent any interruptions. Version `3` of out automation document also introduced the consolidated distributor package and reduces the overall cost of using the Official AWS Distributor Package.
+> Learn more on how to migrate in the [Consolidated Package Migration Guide](./migrate.md).
+
 This deployment guide outlines the steps required to use the published third party distributor package in AWS. This method prevents the need to build your own packages and publish your own SSM automation documents to AWS.
 
 If you have a question checkout the [FAQ](#faq) to see if it has already been answered. If it has not been answered in the FAQ, please open an [issue](https://github.com/CrowdStrike/aws-ssm-distributor/issues/new/choose) and we will happily help.
@@ -320,13 +325,11 @@ Using State Manager associations, we can create a single association that will d
 
 For more information on State Manager, see the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-state-about.html).
 
-> **Note:** There are two distributor packages one for Windows and Linux. This was due to the way packages were versioned at launch. Starting version v1.0.0 and later there is no difference between the two packages. You can choose either package and it will work on both Windows and Linux. In the future this may be replaced with a single package.
-
 <details><summary>Using the AWS Console</summary>
 <p>
 
 1. In the AWS console, go to **AWS Systems Manager** > **Node Management** > **Distributor** > **Third Party**.
-2. Select either package (It does not matter, see note above).
+2. Select the `FalconSensor-CrowdStrike` package.
     <details><summary>picture</summary>
     <p>
 
@@ -453,4 +456,6 @@ The `CrowdStrike-FalconSensorDeploy` automation document can be found in the AWS
 
 ### Why do some automation steps stay pending?
 
+> [!NOTE]
+> The `v3` of the `CrowdStrike-FalconSensorDeploy` removed conditional actions due to the switch to the consolidated distributor package. 
 The `CrowdStrike-FalconSensorDeploy` automation document contains conditional actions that will only run if certain conditions are met. If a steps conditions are not met they will stay in a `Pending` state. You can read more about [automation statuses here](https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-statuses.html).
