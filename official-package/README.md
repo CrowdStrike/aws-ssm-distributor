@@ -1,7 +1,7 @@
 # Official AWS Distributor Package
 
 > [!IMPORTANT]
-> AWS is decomissioning Python 3.8 which is currently used in `v1` and `v2` of the automation document used in our Official AWS Distributor Package.
+> AWS is decomissioning Python 3.7 which is currently used in `v1` and `v2` of the automation document used in our Official AWS Distributor Package.
 > Please ensure you are using version `3` of the automation document to prevent any interruptions. Version `3` of out automation document also introduced the consolidated distributor package and reduces the overall cost of using the Official AWS Distributor Package.
 > Learn more on how to migrate in the [Consolidated Package Migration Guide](./migrate.md).
 
