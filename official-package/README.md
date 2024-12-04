@@ -36,6 +36,7 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 | Ubuntu 18.04                                             | x86_64, arm64 |
 | Ubuntu 20.04                                             | x86_64, arm64 |
 | Ubuntu 22.04                                             | x86_64, arm64 |
+| Ubuntu 24.04                                             | x86_64, arm64 |
 | Debian 9                                                 | x86_64        |
 | Debian 10                                                | x86_64        |
 | Debian 11                                                | x86_64        |
@@ -333,7 +334,7 @@ For more information on State Manager, see the [AWS documentation](https://docs.
     <details><summary>picture</summary>
     <p>
 
-    ![distributor-third-party-tab](./assets/distributor-third-party-tab.png)
+    ![distributor-third-party-tab](./assets/consolidated-third-party.png)
 
     </p>
     </details>
@@ -456,7 +457,8 @@ The `CrowdStrike-FalconSensorDeploy` automation document can be found in the AWS
 
 ### Why do some automation steps stay pending?
 
-> [!NOTE]
-> The `v3` of the `CrowdStrike-FalconSensorDeploy` removed conditional actions due to the switch to the consolidated distributor package. 
-
 The `CrowdStrike-FalconSensorDeploy` automation document contains conditional actions that will only run if certain conditions are met. If a steps conditions are not met they will stay in a `Pending` state. You can read more about [automation statuses here](https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-statuses.html).
+
+### Why are there multiple FalconSensor Distributor Packages
+
+You should only use the consolidated distributor package `FalconSensor-CrowdStrike`. The consolidated official distributor package `FalconSensor-CrowdStrike` was released December 2nd 2024. The `FalconSensor-Linux` and `FalconSensor-Windows` packages will be decomissioned once all customers have migrated over to the consolidated package.

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v2.0.0] - 12-02-2024
+
+### Added
+
+- Ubuntu 24.04 x86_64/arm64 support
+- Two new automation level outputs for a general message and a error message.
+- Per instance reporting on why they were skipped (Shutdown, Terminated, ConnectionLost, Unkown) with instructions on resolving the issue.
+- Consolidated package `FalconSensor-CrowdStrike` for both windows and linux
+- Reduced overall cost of using the `CrowdStrike-FalconSensorDeploy` automation document
+- Updated retry logic to handle aws backoff requests
+
 ## [v1.1.0] - 07-28-2023
 
 ### Added
