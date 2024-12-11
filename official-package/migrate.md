@@ -39,3 +39,5 @@ The install arguments for windows and linux changed. The rest of the `additional
 | --- | --- | --- |
 | Windows | `SSM_CS_INSTALLPARAMS` | `SSM_CS_WINDOWS_INSTALLPARAMS` |
 | Linux | `SSM_CS_INSTALLPARAMS` | `SSM_CS_LINUX_INSTALLPARAMS` |
+| Windows | `SSM_CS_WINDOWS_VERSION` | `SSM_CS_VERSION` |
+| Linux | `SSM_CS_LINUX_VERSION` | `SSM_CS_VERSION` |
