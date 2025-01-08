@@ -2,7 +2,7 @@
 
 Migrating to the consolidated package is a simple process. For the vast majority of customers if you are using our recommended deployment method of State Manager and are targeting the `Default at runtime` version of the automation document you are already migrated.
 
-- **No Breaking Changes** - The new consolidated package and automation document are backwards compatable for existing deployments.
+- **No Breaking Changes** - The new consolidated package and automation document are backwards compatable for existing deployments using our automation document.
 
 ## Benefits
 
