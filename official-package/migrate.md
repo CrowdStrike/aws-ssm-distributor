@@ -7,6 +7,7 @@ Migrating to the consolidated package is a simple process. For the vast majority
 ## Benefits
 
 - **Ubuntu 24.04 x86_64, arm64 Support** - The consolidated package adds support for Ubuntu 24.04 x86_64 & arm64.
+- **Debian 12 x86_64, arm64 Support** - The consolidated package adds support for Debian 12 x86_64 & arm64.
 - **Improved Error Handling** - Added automation level outputs that will provide information about what happened during the run and link to any relevant documentation to help resolve issues.
 ![Error Handling](./assets/ec2_not_in_ssm.png)
 - **Fewer Automation Document Steps (Reduced Cost)** - When you use an automation document in SSM you are charged per automation step. The consolidated package went from 7 to 4 steps. Reducing the cost of using the Official Distributor package.
