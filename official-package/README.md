@@ -40,6 +40,7 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 | Debian 9                                                 | x86_64        |
 | Debian 10                                                | x86_64        |
 | Debian 11                                                | x86_64        |
+| Debian 12                                                | x86_64, arm64 |
 | All Windows Versions supported by the CrowdStrike Sensor | x86_64        |
 
 > [!NOTE]
