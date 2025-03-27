@@ -16,7 +16,6 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 
 | Operating System                                         | Architecture  |
 | -------------------------------------------------------- | ------------- |
-| Amazon Linux 1                                           | x86_64        |
 | Amazon Linux 2                                           | x86_64, arm64 |
 | Amazon Linux 2023                                        | x86_64, arm64 |
 | Red Hat Enterprise Linux 6                               | x86_64        |
