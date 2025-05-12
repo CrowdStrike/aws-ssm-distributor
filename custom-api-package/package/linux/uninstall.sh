@@ -1,3 +1,4 @@
+#!/bin/bash
 echo 'Uninstalling Falcon Sensor...'
 
 # Error Handling
