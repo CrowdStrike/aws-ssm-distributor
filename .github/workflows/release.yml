@@ -19,4 +19,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
-          files: custom-api-package/package/builds/s3/*
+          files: custom-api-package/package/builds/custom-api-package.zip
