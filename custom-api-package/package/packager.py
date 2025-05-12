@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 FILTER_KEYWORD = "<<SENSOR_DOWNLOAD_FILTER>>"
 PACKAGE_MANAGER_KEYWORD = "<<PACKAGE_MANAGER>>"
 
+root_dir = os.path.dirname(__file__)
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -29,7 +31,7 @@ def main():
     logger.info(f"Creating custom-api distribtor package version: {package_version}")
 
     distros = {}
-    with open("./distros.json", "r") as distro_file:
+    with open(os.path.join(root_dir, "distros.json"), "r") as distro_file:
         distros = json.load(distro_file)
 
     if len(distros) == 0:
@@ -43,16 +45,16 @@ def main():
         "packages": {},
         "files": {},
     }
-    base_build_dir = "./builds"
+    base_build_dir = os.path.join(root_dir, "builds")
 
     for platform in distros:
         if platform == "linux":
-            install_script = "./linux/install.sh"
-            uninstall_script = "./linux/uninstall.sh"
+            install_script = os.path.join(root_dir, "./linux/install.sh")
+            uninstall_script = os.path.join(root_dir, "./linux/uninstall.sh")
             file_ext = ".sh"
         else:
-            install_script = "./windows/install.ps1"
-            uninstall_script = "./windows/uninstall.ps1"
+            install_script = os.path.join(root_dir, "./windows/install.ps1")
+            uninstall_script = os.path.join(root_dir, "./windows/uninstall.ps1")
             file_ext = ".ps1"
 
         for distro in distros[platform]:
