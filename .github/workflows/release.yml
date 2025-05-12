@@ -12,7 +12,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Build packages
-        run: python3 custom-api-package/package/packager.py ${{github.ref_name}}
+        run: python3 custom-api-package/package/packager.py -v ${{github.ref_name}}
       - name: release
         uses: softprops/action-gh-release@v2
         # if: github.ref_type == 'tag'
