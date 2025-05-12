@@ -15,6 +15,6 @@ jobs:
         run: python3 custom-api-package/package/packager.py -v ${{github.ref_name}}
       - name: release
         uses: softprops/action-gh-release@v2
-        # if: github.ref_type == 'tag'
+        if: github.ref_type == 'tag'
         with:
           files: custom-api-package/package/builds/s3/*
