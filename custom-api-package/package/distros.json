@@ -1,0 +1,291 @@
+{
+    "linux": [
+        {
+            "name": "amazon",
+            "version": "2",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'Amazon Linux'+os_version:'2'+platform:'linux'"
+        },
+        {
+            "name": "amazon",
+            "version": "2",
+            "arch": "arm64",
+            "package_manager": "yum",
+            "filter": "os:'Amazon Linux'+os_version:'2 - arm64'+platform:'linux'"
+        },
+        {
+            "name": "amazon",
+            "version": "2023",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'Amazon Linux'+os_version:'2023'+platform:'linux'"
+        },
+        {
+            "name": "amazon",
+            "version": "2023",
+            "arch": "arm64",
+            "package_manager": "yum",
+            "filter": "os:'Amazon Linux'+os_version:'2023 - arm64'+platform:'linux'"
+        },
+        {
+            "name": "redhat",
+            "version": "7.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'7'+platform:'linux'"
+        },
+        {
+            "name": "redhat",
+            "version": "8.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'8'+platform:'linux'"
+        },
+        {
+            "name": "redhat",
+            "version": "8.*",
+            "arch": "arm64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'8 - arm64'+platform:'linux'"
+        },
+        {
+            "name": "redhat",
+            "version": "9.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'9'+platform:'linux'"
+        },
+        {
+            "name": "redhat",
+            "version": "9.*",
+            "arch": "arm64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'9 - arm64'+platform:'linux'"
+        },
+        {
+            "name": "almalinux",
+            "version": "8.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'8'+platform:'linux'"
+        },
+        {
+            "name": "almalinux",
+            "version": "8.*",
+            "arch": "arm64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'8 - arm64'+platform:'linux'"
+        },
+        {
+            "name": "almalinux",
+            "version": "9.*",
+            "arch": "arm64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'9 - arm64'+platform:'linux'"
+        },
+        {
+            "name": "almalinux",
+            "version": "9.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'9'+platform:'linux'"
+        },
+        {
+            "name": "rocky",
+            "version": "8.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'8'+platform:'linux'"
+        },
+        {
+            "name": "rocky",
+            "version": "8.*",
+            "arch": "arm64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'8 - arm64'+platform:'linux'"
+        },
+        {
+            "name": "rocky",
+            "version": "9.*",
+            "arch": "arm64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'9 - arm64'+platform:'linux'"
+        },
+        {
+            "name": "rocky",
+            "version": "9.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*RHEL*'+os_version:'9'+platform:'linux'"
+        },
+        {
+            "name": "centos",
+            "version": "7.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*CentOS*'+os_version:'7'+platform:'linux'"
+        },
+        {
+            "name": "centos",
+            "version": "8.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*CentOS*'+os_version:'8'+platform:'linux'"
+        },
+        {
+            "name": "centos",
+            "version": "8.*",
+            "arch": "arm64",
+            "package_manager": "yum",
+            "filter": "os:'*CentOS*'+os_version:'8 - arm64'+platform:'linux'"
+        },
+        {
+            "name": "oracle",
+            "version": "6.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*Oracle*'+os_version:'6'+platform:'linux'"
+        },
+        {
+            "name": "oracle",
+            "version": "7.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*Oracle*'+os_version:'7'+platform:'linux'"
+        },
+        {
+            "name": "oracle",
+            "version": "8.*",
+            "arch": "x86_64",
+            "package_manager": "yum",
+            "filter": "os:'*Oracle*'+os_version:'8'+platform:'linux'"
+        },
+        {
+            "name": "suse",
+            "version": "12.*",
+            "arch": "x86_64",
+            "package_manager": "zypper",
+            "filter": "os:'*SLES*'+os_version:'12'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "suse",
+            "version": "15.*",
+            "arch": "x86_64",
+            "package_manager": "zypper",
+            "filter": "os:'*SLES*'+os_version:'15'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "ubuntu",
+            "version": "16.*",
+            "arch": "x86_64",
+            "package_manager": "dpkg",
+            "filter": "os:'*Ubuntu*'+os_version:'*16*'+os_version:!'*arm64*'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "ubuntu",
+            "version": "18.*",
+            "arch": "x86_64",
+            "package_manager": "dpkg",
+            "filter": "os:'*Ubuntu*'+os_version:'*18*'+os_version:!'*arm64*'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "ubuntu",
+            "version": "20.*",
+            "arch": "x86_64",
+            "package_manager": "dpkg",
+            "filter": "os:'*Ubuntu*'+os_version:'*20*'+os_version:!'*arm64*'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "ubuntu",
+            "version": "22.*",
+            "minor_version": "*",
+            "arch": "x86_64",
+            "package_manager": "dpkg",
+            "filter": "os:'*Ubuntu*'+os_version:'*22*'+os_version:!'*arm64*'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "ubuntu",
+            "version": "24.*",
+            "minor_version": "*",
+            "arch": "x86_64",
+            "package_manager": "dpkg",
+            "filter": "os:'*Ubuntu*'+os_version:'*24*'+os_version:!'*arm64*'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "ubuntu",
+            "version": "24.*",
+            "arch": "arm64",
+            "package_manager": "dpkg",
+            "filter": "os:'*Ubuntu*'+os_version:'*24*'+os_version:~'arm64'+platform:'linux'"
+        },
+        {
+            "id": "ubuntu22",
+            "name": "ubuntu",
+            "version": "22.*",
+            "arch": "arm64",
+            "package_manager": "dpkg",
+            "filter": "os:'*Ubuntu*'+os_version:'*22*'+os_version:~'arm64'+platform:'linux'"
+        },
+        {
+            "name": "ubuntu",
+            "version": "18.*",
+            "arch": "arm64",
+            "package_manager": "dpkg",
+            "filter": "os:'*Ubuntu*'+os_version:'*18*'+os_version:~'arm64'+platform:'linux'"
+        },
+        {
+            "name": "ubuntu",
+            "version": "20.*",
+            "arch": "arm64",
+            "package_manager": "dpkg",
+            "filter": "os:'*Ubuntu*'+os_version:'*20*'+os_version:~'arm64'+platform:'linux'"
+        },
+        {
+            "name": "debian",
+            "version": "9.*",
+            "arch": "x86_64",
+            "package_manager": "dpkg",
+            "filter": "os:'Debian'+os_version:'*9*'+os_version:!'*arm64*'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "debian",
+            "version": "10.*",
+            "minor_version": "*",
+            "arch": "x86_64",
+            "package_manager": "dpkg",
+            "filter": "os:'Debian'+os_version:'*10*'+os_version:!'*arm64*'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "debian",
+            "version": "11.*",
+            "arch": "x86_64",
+            "package_manager": "dpkg",
+            "filter": "os:'Debian'+os_version:'*11*'+os_version:!'*arm64*'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "debian",
+            "version": "12.*",
+            "arch": "x86_64",
+            "package_manager": "dpkg",
+            "filter": "os:'Debian'+os_version:'*12*'+os_version:!'*arm64*'+os_version:!~'zLinux'+platform:'linux'"
+        },
+        {
+            "name": "debian",
+            "version": "12",
+            "minor_version": "*",
+            "arch": "arm64",
+            "package_manager": "dpkg",
+            "filter": "os:'Debian'+os_version:'*12*'+os_version:~'arm64'+platform:'linux'"
+        }
+    ],
+    "windows": [
+        {
+            "name": "windows",
+            "version": "_any",
+            "arch": "_any",
+            "filter": "os:'Windows'+platform:'windows'"
+        }
+    ]
+}
+
