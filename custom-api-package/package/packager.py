@@ -99,6 +99,14 @@ def main():
             with open(f"{base_build_dir}/s3/manifest.json", "w") as file:
                 json.dump(manifest_data, file, indent=4)
 
+            with zipfile.ZipFile(
+                f"{base_build_dir}/custom-api-package.zip"
+            ) as package_zip:
+                for root, _, files in os.walk(os.path.join(base_build_dir, "s3")):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        package_zip.write(file_path, basename(file_path))
+
 
 def zip_package(package_dir, zip_name, base_build_dir):
     zip_package_name = f"{base_build_dir}/s3/{zip_name}.zip"
