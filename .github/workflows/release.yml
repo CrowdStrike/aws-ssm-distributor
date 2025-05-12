@@ -10,7 +10,7 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v5
       - name: Build packages
-        run: python3 ./package/packager.py
+        run: python3 custom-api-package/package/packager.py
       - name: release
         uses: softprops/action-gh-release@v2
         # if: github.ref_type == 'tag'
