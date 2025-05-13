@@ -99,6 +99,7 @@ def main():
             with open(f"{base_build_dir}/s3/manifest.json", "w") as file:
                 json.dump(manifest_data, file, indent=4)
 
+            logger.info("Building custom-api-package.zip")
             with zipfile.ZipFile(
                 f"{base_build_dir}/custom-api-package.zip", "w", zipfile.ZIP_DEFLATED
             ) as package_zip:
