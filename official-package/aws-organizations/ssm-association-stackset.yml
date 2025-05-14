@@ -2,6 +2,38 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Association for CrowdStrike Falcon SSM Distributor
 
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: General
+        Parameters:
+          - MainRegion
+      - Label:
+          default: Falcon API Credentials
+        Parameters:
+          - FalconClientID
+          - FalconSecret
+          - FalconCloud
+      - Label:
+          default: Credential Storage Options
+        Parameters:
+          - SecretStorageMethod
+          - SecretsManagerSecretName
+          - FalconClientIdParameter
+          - FalconSecretParameter
+          - FalconCloudParameter
+      - Label:
+          default: Falcon Distributor Configuration
+        Parameters:
+          - AutomationAssumeRole
+          - ProvisionOU
+          - Action
+          - ScheduleExpression
+          - MaxErrors
+          - MaxConcurrency
+        
+
 Parameters:
   AutomationAssumeRole:
     Description: Execution Role for CrowdStrike SSM Distributor Package.
@@ -16,6 +48,20 @@ Parameters:
     AllowedValues: [ "ParameterStore", "SecretsManager"]
   SecretsManagerSecretName:
     Description: Secrets Manager Secret Name that contains the Falcon ClientId, ClientSecret, and Cloud for the CrowdStrike APIs. Required if SecretStorageMethod is SecretsManager.
+    Type: String
+  SecretsManagerSecretName:
+    Type: String
+    Description: 'The name of the secret used to store the Falcon ClientId, ClientSecret, and Cloud for the CrowdStrike APIs.'
+  FalconClientID:
+    Description: Your Falcon OAuth2 Client ID.
+    NoEcho: 'true'
+    Type: String
+  FalconSecret:
+    Description: Your Falcon OAuth2 API Secret.
+    NoEcho: 'true'
+    Type: String  
+  BaseURL:
+    Description: Your Falcon OAuth2 API Base URL.
     Type: String
   DocumentVersion:
     Description: The version of the SSM document to associate with the target.
@@ -66,8 +112,44 @@ Conditions:
   SetWindowsInstallerParams: !Not [ !Equals [ !Ref WindowsInstallerParams, '' ] ]
   SetLinuxPackageVersion: !Not [ !Equals [ !Ref LinuxPackageVersion, '' ] ]
   SetWindowsPackageVersion: !Not [ !Equals [ !Ref WindowsPackageVersion, '' ] ]
+  UseSecretsManager: !Equals [!Ref SecretStorageMethod, 'SecretsManager']
 
 Resources:
+  CrowdStrikeSecrets:
+    Type: AWS::SecretsManager::Secret
+    Condition: UseSecretsManager
+    Properties:
+      Description: CrowdStrike Falcon Credentials for SSM Distributor
+      Name: !Ref SecretsManagerSecretName
+      SecretString:
+        Fn::Join:
+          - ''
+          - - '{"ClientId":"'
+            - Ref: "FalconClientID"
+            - '","ClientSecret":"'
+            - Ref: "FalconSecret"
+            - '","Cloud": "'
+            - Ref: BaseURL
+            - '"}'
+            
+  SSMAutomationRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Ref AutomationAssumeRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'ssm.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole'
+        - !If
+            - UseSecretsManager
+            - 'arn:aws:iam::aws:policy/SecretsManagerReadWrite'
+            - !Ref 'AWS::NoValue'
+
   CrowdStrikeSSMAssociation:
     Type: AWS::SSM::Association
     Properties: 

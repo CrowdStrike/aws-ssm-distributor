@@ -1,0 +1,168 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Association for CrowdStrike Falcon SSM Distributor
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: General
+        Parameters: [MainRegion]
+      - Label:
+          default: Falcon API Credentials
+        Parameters:
+          - SecretsManagerSecretName
+          - FalconClientID
+          - FalconSecret
+          - FalconCloud
+      - Label:
+          default: Falcon Distributor Package Configuration
+        Parameters:
+          - Action
+          - LinuxPackageVersion
+          - LinuxInstallerParams
+          - WindowsPackageVersion
+          - WindowsInstallerParams
+      - Label:
+          default: Systems Manager Association Configuration
+        Parameters:
+          - ScheduleExpression
+          - MaxErrors
+          - MaxConcurrency
+          - ComplianceSeverity
+          - AutomationAssumeRole
+Parameters:
+  MainRegion:
+    Type: String
+    Description: The main aws region to deploy the required global resources. This
+      value is mainly used to allow this CloudFormation template to be used as a stackset
+      allowing you to deploy to multiple accounts and regions at the same time. The
+      region provided to MainRegion needs to be part of that deployment or the required
+      roles and distributor package will not be created. The global resources consist
+      of the automation assume role for systems manager, the lambda function used
+      to create the ssm distributor package, and the iam role used by that lambda
+      function.
+    Default: us-east-1
+  AutomationAssumeRoleName:
+    Description: The name to be used when creating the automation assume role used
+      to execute the distributor package.
+    Type: String
+    Default: crowdstrike-distributor-deploy-role
+  Action:
+    Description: Specify whether or not to install or uninstall the package.
+    Type: String
+    AllowedValues: [Install, Uninstall]
+    Default: Install
+  SecretsManagerSecretName:
+    Description: Secrets Manager Secret Name that contains the Falcon ClientId, ClientSecret,
+      and Cloud for the CrowdStrike APIs. Required if SecretStorageMethod is SecretsManager.
+    Type: String
+    Default: /CrowdStrike/Falcon/Distributor
+  FalconClientID:
+    Description: Your Falcon OAuth2 Client ID.
+    NoEcho: 'true'
+    Type: String
+  FalconSecret:
+    Description: Your Falcon OAuth2 API Secret.
+    NoEcho: 'true'
+    Type: String
+  FalconCloud:
+    Description: Your Falcon OAuth2 API Base URL.
+    Type: String
+  ComplianceSeverity:
+    Description: The severity level that is assigned to the association
+    Type: String
+    AllowedValues: [CRITICAL, HIGH, LOW, MEDIUM, UNSPECIFIED]
+    Default: UNSPECIFIED
+  ScheduleExpression:
+    Description: A cron expression that specifies a schedule when the association
+      runs. The schedule runs in Coordinated Universal Time (UTC).
+    Type: String
+    Default: cron(0 0 */1 * * ? *)
+  MaxErrors:
+    Description: The number of errors that are allowed before the system stops sending
+      requests to run the association on additional targets. You can specify either
+      an absolute number of errors, for example 10, or a percentage of the target
+      set, for example 10%.
+    Type: String
+    Default: ''
+  MaxConcurrency:
+    Description: The maximum number of targets allowed to run the association at the
+      same time. You can specify a number, for example 10, or a percentage of the
+      target set, for example 10%. The default value is 100%, which means all targets
+      run the association at the same time.
+    Type: String
+    Default: ''
+  LinuxInstallerParams:
+    Type: String
+    Default: ''
+  WindowsInstallerParams:
+    Type: String
+    Default: ''
+  LinuxPackageVersion:
+    Type: String
+    Default: ''
+  WindowsPackageVersion:
+    Type: String
+    Default: ''
+Conditions:
+  SetMaxErrors: !Not
+    - !Equals [!Ref MaxErrors, '']
+  SetMaxConcurrency: !Not
+    - !Equals [!Ref MaxConcurrency, '']
+  IsMainRegion: !Equals [!Ref 'AWS::Region', !Ref MainRegion]
+Resources:
+  SSMAutomationRole:
+    Condition: IsMainRegion
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref AutomationAssumeRoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ssm.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+  CrowdStrikeSecrets:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: CrowdStrike Falcon Credentials for SSM Distributor
+      Name: !Ref SecretsManagerSecretName
+      SecretString:
+        Fn::Join:
+          - ''
+          -   - '{"ClientId":"'
+              - Ref: FalconClientID
+              - '","ClientSecret":"'
+              - Ref: FalconSecret
+              - '","Cloud": "'
+              - Ref: FalconCloud
+              - '"}'
+  CrowdStrikeSSMAssociation:
+    Type: AWS::SSM::Association
+    Properties:
+      AssociationName: crowdstrike-falcon-sensor-deploy
+      Name: CrowdStrike-FalconSensorDeploy
+      AutomationTargetParameterName: InstanceIds
+      Targets:
+        - Key: InstanceIds
+          Values: ['*']
+      Parameters:
+        AutomationAssumeRole:
+          - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${AutomationAssumeRoleName}"
+        Action: [!Ref Action]
+        SecretStorageMethod: [SecretsManager]
+        SecretsManagerSecretName: [!Ref SecretsManagerSecretName]
+        LinuxInstallerParams: [!Ref LinuxInstallerParams]
+        WindowsInstallerParams: [!Ref WindowsInstallerParams]
+        LinuxPackageVersion: [!Ref LinuxPackageVersion]
+        WindowsPackageVersion: [!Ref WindowsPackageVersion]
+      MaxConcurrency:
+        Fn::If: [SetMaxConcurrency, !Ref MaxConcurrency, !Ref AWS::NoValue]
+      MaxErrors:
+        Fn::If: [SetMaxErrors, !Ref MaxErrors, !Ref AWS::NoValue]
+      ComplianceSeverity: !Ref ComplianceSeverity
+      ScheduleExpression: !Ref ScheduleExpression
