@@ -566,7 +566,7 @@ DISTROS = {
     ],
 }
 
-linux_install_script = """#!/bin/bash
+linux_install_script = r"""#!/bin/bash
 if pgrep  -u root falcon-sensor >/dev/null 2>&1 ; then
   echo "Falcon Sensor already installed... if you want to update or downgrade, please use Sensor Update Policies in the CrowdStrike console. Please see: https://falcon.crowdstrike.com/documentation/66/sensor-update-policies for more information."
   exit 0
@@ -623,8 +623,8 @@ proxy_port=""
 CCID="${SSM_CS_CCID}"
 INSTALLTOKEN="${SSM_CS_INSTALLTOKEN}"
 SSM_CS_LINUX_INSTALLPARAMS="${SSM_CS_LINUX_INSTALLPARAMS:-}"
-SSM_CS_LINUX_INSTALLPARAMS="${SSM_CS_LINUX_INSTALLPARAMS//\`/\\\`}"
-SSM_CS_LINUX_INSTALLPARAMS="${SSM_CS_LINUX_INSTALLPARAMS//\$/\\\$}"
+SSM_CS_LINUX_INSTALLPARAMS="${SSM_CS_LINUX_INSTALLPARAMS//\\\`/\\\``}"
+SSM_CS_LINUX_INSTALLPARAMS="${SSM_CS_LINUX_INSTALLPARAMS//\\\$/\\\$}"
 declare -a INSTALLPARAMS="($SSM_CS_LINUX_INSTALLPARAMS)"
 
 for arg in "${INSTALLPARAMS[@]}"; do
@@ -763,7 +763,7 @@ else
 fi
 """
 
-linux_uninstall_script = """#!/bin/bash
+linux_uninstall_script = r"""#!/bin/bash
 echo 'Uninstalling Falcon Sensor...'
 
 # Error Handling
@@ -806,7 +806,7 @@ else
 fi
 """
 
-windows_install_script = """[CmdletBinding()]
+windows_install_script = r"""[CmdletBinding()]
 param()
 
 #########
@@ -1031,7 +1031,7 @@ else {
 Write-Output "Falcon Sensor version ${version} installed successfully."
 """
 
-windows_uninstall_script = """[CmdletBinding()]
+windows_uninstall_script = r"""[CmdletBinding()]
 param()
 
 Write-Output 'Uninstalling Falcon Sensor...'
@@ -1076,13 +1076,13 @@ if ($agentService -and $agentService.Status -eq 'Running') {
 }
 
 # Checks if the CrowdStrike registry key was successfully removed and throws an exception if it still exists
-if (Test-Path -Path HKLM:\\System\\Crowdstrike) {
+if (Test-Path -Path HKLM:\System\Crowdstrike) {
   Write-Output 'CrowdStrike registry key still exists. Uninstall failed.'
   exit 1
 }
 
 # Checks if the CrowdStrike driver was successfully removed and throws an exception if it still exists
-if (Test-Path -Path "${env:SYSTEMROOT}\\System32\\drivers\\CrowdStrike") {
+if (Test-Path -Path "${env:SYSTEMROOT}\System32\drivers\CrowdStrike") {
   Write-Output 'CrowdStrike driver still exists. Uninstall failed.'
   exit 1
 }
