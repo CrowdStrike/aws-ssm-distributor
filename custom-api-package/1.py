@@ -1,18 +1,18 @@
+import hashlib
 import json
-
-# import cfnresponse
-import boto3
+import logging
 import os
-import botocore
-from os.path import basename
-from botocore.config import Config
 import time
 import zipfile
-import hashlib
-import logging
+from os.path import basename
 
+import boto3
+import botocore
+import cfnresponse
+from botocore.config import Config
+
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
-logger.setLevel("INFO")
 
 config = Config(retries={"max_attempts": 10, "mode": "standard"})
 
@@ -30,7 +30,7 @@ def handler(event, context):
     s3_bucket_name = event["ResourceProperties"].get("S3BucketName")
 
     if s3_bucket_name is None:
-        fail_response("S3BucketName is required.")
+        fail_response(event, context, "S3BucketName is required.")
 
     try:
         account_client = boto3.client("account", config=config)
@@ -43,8 +43,8 @@ def handler(event, context):
             for region in page["Regions"]:
                 enabled_regions.append(region["RegionName"])
 
-        for region in enabled_regions:
-            if event["RequestType"] in ["Create", "Update"]:
+        if event["RequestType"] in ["Create", "Update"]:
+            for region in enabled_regions:
                 ssm_client = boto3.client("ssm", region_name=region, config=config)
                 try:
                     ssm_client.describe_document(Name=package_name)
@@ -59,75 +59,105 @@ def handler(event, context):
                 except botocore.exceptions.ClientError as error:
                     raise error
 
-        if len(missing_regions) > 0:
-            s3_path = f"{package_name}/{package_verison}"
-            s3_dir, manifest = create_local_packages(version=package_verison)
-            sync_s3(s3_dir, s3_bucket_name, s3_path)
+            if len(missing_regions) > 0:
+                s3_path = f"{package_name}/{package_verison}"
+                s3_dir, manifest = create_local_packages(version=package_verison)
+                sync_s3(s3_dir, s3_bucket_name, s3_path)
 
-            for region in missing_regions:
-                logger.info(
-                    f"Creating distribtor package: {package_name} {package_verison} in {region}"
-                )
-                ssm_client = boto3.client("ssm", region_name=region, config=config)
-                create_distributor_package(
-                    client=ssm_client,
-                    package_name=package_name,
-                    manifest=manifest,
-                    version=package_verison,
-                    bucket=s3_bucket_name,
-                    s3_path=s3_path,
-                )
+                for region in missing_regions:
+                    logger.info(
+                        f"Creating distribtor package: {package_name} {package_verison} in {region}"
+                    )
+                    ssm_client = boto3.client("ssm", region_name=region, config=config)
+                    create_distributor_package(
+                        client=ssm_client,
+                        package_name=package_name,
+                        manifest=manifest,
+                        version=package_verison,
+                        bucket=s3_bucket_name,
+                        s3_path=s3_path,
+                    )
 
-        while len(missing_regions) > 0:
-            for region in missing_regions:
-                ssm_client = boto3.client("ssm", region_name=region, config=config)
-                try:
-                    document = ssm_client.describe_document(Name=package_name)[
-                        "Document"
-                    ]
-                    status = document["Status"]
-                    if status == "Active":
-                        logger.info(
-                            f"Distributor package: {package_name} {package_verison} successfully created in {region}."
-                        )
-                        missing_regions.remove(region)
+            while len(missing_regions) > 0:
+                for region in missing_regions:
+                    ssm_client = boto3.client("ssm", region_name=region, config=config)
+                    try:
+                        document = ssm_client.describe_document(Name=package_name)[
+                            "Document"
+                        ]
+                        status = document["Status"]
+                        if status == "Active":
+                            logger.info(
+                                f"Distributor package: {package_name} {package_verison} successfully created in {region}."
+                            )
+                            missing_regions.remove(region)
+                            continue
+                        elif status == "Failed":
+                            status_information = document["StatusInformation"]
+                            fail_response(
+                                event,
+                                context,
+                                f"Distributor package: {package_name} {package_verison} failed during creation in {region}. Reason: {status_information}",
+                            )
+                        else:
+                            logger.info(
+                                f"Distributor package: {package_name} {package_verison} is still being created in {region}."
+                            )
+                    except ssm_client.exceptions.InvalidDocument:
                         continue
-                    elif status == "Failed":
-                        status_information = document["StatusInformation"]
-                        fail_response(
-                            f"Distributor package: {package_name} {package_verison} failed during creation in {region}. Reason: {status_information}"
-                        )
-                    else:
+                    except botocore.exceptions.ClientError as error:
+                        raise error
+
+                time.sleep(5)
+
+            if len(missing_regions) == 0:
+                msg = f"Successfully created {package_name} {package_verison} in all regions."
+                logger.info(msg)
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, {"msg": msg})
+            else:
+                fail_response(
+                    event,
+                    context,
+                    f"The following regions are still missing the distributor package: {"".join(missing_regions)}",
+                )
+
+        if event["RequestType"] == "Delete":
+            target_regions = enabled_regions
+            while len(target_regions) > 0:
+                for region in target_regions:
+                    ssm_client = boto3.client("ssm", region_name=region, config=config)
+                    try:
+                        document = ssm_client.describe_document(Name=package_name)[
+                            "Document"
+                        ]
+                        status = document["Status"]
+                        if status != "Deleting":
+                            logger.info(
+                                f"Marking distributor package: {package_name} in {region} for deletion."
+                            )
+                            ssm_client.delete_document(Name=package_name)
+                    except ssm_client.exceptions.InvalidDocument:
                         logger.info(
-                            f"Distributor package: {package_name} {package_verison} is still being created in {region}."
+                            f"Distributor package: {package_name} in {region} was deleted."
                         )
-                except ssm_client.exceptions.InvalidDocument:
-                    continue
-                except botocore.exceptions.ClientError as error:
-                    raise error
+                        target_regions.remove(region)
+                    except botocore.exceptions.ClientError as error:
+                        raise error
 
-            time.sleep(5)
-
-        if missing_regions == 0:
             msg = (
-                f"Successfully created {package_name} {package_verison} in all regions."
+                f"Successfully deleted {package_name} {package_verison} in all regions."
             )
             logger.info(msg)
-            # cfnresponse.send(event, context, cfnresponse.SUCCESS, {"msg": msg})
-
-        else:
-            fail_response(
-                f"The following regions are still missing the distributor package: {"".join(missing_regions)}"
-            )
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, {"msg": msg})
 
     except Exception as e:
-        fail_response(e)
+        fail_response(event, context, e)
 
 
-def fail_response(e):
+def fail_response(event, context, e):
     responseData = {"error": str(e)}
     logging.error(e)
-    # cfnresponse.send(event, context, cfnresponse.FAILED, responseData)
+    cfnresponse.send(event, context, cfnresponse.FAILED, responseData)
     print(responseData)
 
 
@@ -136,9 +166,9 @@ def sync_s3(s3_dir, s3_bucket_name, s3_path):
     for root, _, files in os.walk(s3_dir):
         for file in files:
             file_name = os.path.join(root, file)
-            logging.info(f"Uploading {file_name} to {s3_bucket_name}.")
+            logging.info(f"Uploading {file} to {s3_bucket_name}/{s3_path}/{file}.")
             s3_client.upload_file(
-                file_name, s3_bucket_name, os.path.join(s3_path, file_name)
+                file_name, s3_bucket_name, os.path.join(s3_path, file)
             )
 
 
@@ -162,7 +192,7 @@ def create_distributor_package(
 
 def create_local_packages(version):
     build_dir = "/tmp/builds"
-    s3_dir = "/tmp/s3"
+    s3_dir = "/tmp/builds/s3"
     manifest_data = {
         "schemaVersion": "2.0",
         "publisher": "Crowdstrike Inc.",
@@ -223,13 +253,11 @@ def create_local_packages(version):
                 "checksums": {"sha256": get_digest(zip_file_path)}
             }
 
-            with open(os.path.join(s3_dir, "manifest.json"), "w") as file:
-                json.dump(manifest_data, file, indent=4)
+    logger.info("Creating manifest.json")
+    with open(os.path.join(s3_dir, "manifest.json"), "w") as file:
+        json.dump(manifest_data, file, indent=4)
 
-            return s3_dir, manifest_data
-
-
-# cfnresponse.send(event, context, cfnresponse.SUCCESS, response, "Waiter-"+id)
+    return s3_dir, manifest_data
 
 
 def get_digest(file):
@@ -251,6 +279,7 @@ def write_package_script(script, dest, filter, package_manager):
     script = script.replace(FILTER_KEYWORD, filter).replace(
         PACKAGE_MANAGER_KEYWORD, package_manager
     )
+    logger.info(f"Creating file {dest}.")
     with open(dest, "wt") as fout:
         fout.write(script)
 
@@ -1094,9 +1123,9 @@ if __name__ == "__main__":
         {
             "ResourceProperties": {
                 "DistributorPackageName": "CrowdStrike-FalconSensorTest",
-                "S3BucketName": "ffalor-state-manager1",
+                "S3BucketName": "ffalor-ssm-state-manager1",
             },
-            "RequestType": "Create",
+            "RequestType": "Delete",
         },
         "",
     )

@@ -48,6 +48,7 @@ Resources:
   CFNWaiterCustomResource:
     Type: "AWS::CloudFormation::CustomResource"
     Properties:
+      ServiceTimeout: 900
       ServiceToken: !GetAtt CFNWaiter.Arn
       WaitSeconds: 60
 ​

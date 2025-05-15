@@ -109,9 +109,9 @@ Parameters:
   AutomationDocumentName:
     Type: String
     Default: CrowdStrike-FalconSensorInstall
-    Description: The name to use when creating the SSM automation document. 
-      The SSM Automation document is responsible for generating the required 
-      input parameters to run the custom-api distributor package.
+    Description: The name to use when creating the SSM automation document. The SSM
+      Automation document is responsible for generating the required input parameters
+      to run the custom-api distributor package.
   DistributorPackageName:
     Type: String
     Default: CrowdStrike-FalconSensor
@@ -123,6 +123,52 @@ Conditions:
     - !Equals [!Ref MaxConcurrency, '']
   IsMainRegion: !Equals [!Ref "AWS::Region", !Ref MainRegion]
 Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [lambda.amazonaws.com]
+            Action: [sts:AssumeRole]
+      Path: /
+      Policies:
+        - PolicyName: AllowLogs
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: [logs:*]
+                Resource: '*'
+  DistributorPackageCreateLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.13
+      Timeout: 900
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: !Sub |
+          import json
+          import cfnresponse
+          import boto3
+          def handler(event, context):
+            wait_seconds = 0
+            id = str(uuid.uuid1())
+            if event["RequestType"] in ["Create", "Update"]:
+              wait_seconds = int(event["ResourceProperties"].get("WaitSeconds", 0))
+              sleep(wait_seconds)
+            response = {
+              "TimeWaited": wait_seconds,
+              "Id": id 
+            }
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, response, "Waiter-"+id)
+  DistributorPackageCreate:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      ServiceTimeout: 900
+      ServiceToken: !GetAtt CFNWaiter.Arn
+      WaitSeconds: 60
   SSMAutomationRole:
     Condition: IsMainRegion
     Type: AWS::IAM::Role
