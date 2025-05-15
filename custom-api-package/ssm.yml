@@ -123,7 +123,37 @@ Conditions:
     - !Equals [!Ref MaxConcurrency, '']
   IsMainRegion: !Equals [!Ref "AWS::Region", !Ref MainRegion]
 Resources:
+  DistributorPackageS3Bucket:
+    Condition: IsMainRegion
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${DistributorPackageName}-bucket-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: alias/aws/s3
+      PublicAccessBlockConfiguration:
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+  DistributorPackageS3BucketPolicy:
+    Condition: IsMainRegion
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket
+      PolicyDocument:
+        Id: RequireEncryptionInTransit
+        Version: '2012-10-17'
+        Statement:
+          - Principal: '*'
+            Action: '*'
+            Effect: Deny
+            Resource: [!GetAtt Bucket.Arn, !Sub '${Bucket.Arn}/*']
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
   LambdaExecutionRole:
+    Condition: IsMainRegion
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -141,14 +171,17 @@ Resources:
                 Action: [logs:*]
                 Resource: '*'
   DistributorPackageCreateLambda:
+    Condition: IsMainRegion
     Type: AWS::Lambda::Function
     Properties:
       Handler: index.handler
       Runtime: python3.13
       Timeout: 900
+      FunctionName: !Sub ${DistributorPackageName}-create-lambda
+      Description: !Sub The lambda backed customer resource provider for cloudformation. It manages the ${DistributorPackageName} ssm distributor package.
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
-        ZipFile: !Sub |
+        ZipFile: |
           import json
           import cfnresponse
           import boto3
@@ -164,10 +197,11 @@ Resources:
             }
             cfnresponse.send(event, context, cfnresponse.SUCCESS, response, "Waiter-"+id)
   DistributorPackageCreate:
+    Condition: IsMainRegion
     Type: AWS::CloudFormation::CustomResource
     Properties:
       ServiceTimeout: 900
-      ServiceToken: !GetAtt CFNWaiter.Arn
+      ServiceToken: !GetAtt DistributorPackageCreateLambda.Arn
       WaitSeconds: 60
   SSMAutomationRole:
     Condition: IsMainRegion
