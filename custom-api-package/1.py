@@ -6,6 +6,7 @@ import os
 import botocore
 from os.path import basename
 from botocore.config import Config
+import time
 import zipfile
 import hashlib
 import logging
@@ -29,42 +30,131 @@ def handler(event, context):
     s3_bucket_name = event["ResourceProperties"].get("S3BucketName")
 
     if s3_bucket_name is None:
-        raise ValueError("S3BucketName is required.")
+        fail_response("S3BucketName is required.")
 
-    account_client = boto3.client("account", config=config)
-    region_paginator = account_client.get_paginator("list_regions")
-    region_iterator = region_paginator.paginate(
-        RegionOptStatusContains=["ENABLED", "ENABLED_BY_DEFAULT"]
-    )
+    try:
+        account_client = boto3.client("account", config=config)
+        region_paginator = account_client.get_paginator("list_regions")
+        region_iterator = region_paginator.paginate(
+            RegionOptStatusContains=["ENABLED", "ENABLED_BY_DEFAULT"]
+        )
 
-    for page in region_iterator:
-        for region in page["Regions"]:
-            enabled_regions.append(region["RegionName"])
+        for page in region_iterator:
+            for region in page["Regions"]:
+                enabled_regions.append(region["RegionName"])
 
-    for region in enabled_regions:
-        if event["RequestType"] in ["Create", "Update"]:
-            ssm_client = boto3.client("ssm", region_name=region, config=config)
-            try:
-                print(package_name)
-                print(ssm_client.describe_document(Name=package_name))
-            except ssm_client.exceptions.InvalidDocument:
-                missing_regions.append(region)
-                print(region)
-            except botocore.exceptions.ClientError as error:
-                raise error
+        for region in enabled_regions:
+            if event["RequestType"] in ["Create", "Update"]:
+                ssm_client = boto3.client("ssm", region_name=region, config=config)
+                try:
+                    ssm_client.describe_document(Name=package_name)
+                    logger.info(
+                        f"Distributor package: {package_name} already exists in {region}"
+                    )
+                except ssm_client.exceptions.InvalidDocument:
+                    logger.info(
+                        f"Distributor package: {package_name} is missing in {region}"
+                    )
+                    missing_regions.append(region)
+                except botocore.exceptions.ClientError as error:
+                    raise error
 
-    print(missing_regions)
+        if len(missing_regions) > 0:
+            s3_path = f"{package_name}/{package_verison}"
+            s3_dir, manifest = create_local_packages(version=package_verison)
+            sync_s3(s3_dir, s3_bucket_name, s3_path)
+
+            for region in missing_regions:
+                logger.info(
+                    f"Creating distribtor package: {package_name} {package_verison} in {region}"
+                )
+                ssm_client = boto3.client("ssm", region_name=region, config=config)
+                create_distributor_package(
+                    client=ssm_client,
+                    package_name=package_name,
+                    manifest=manifest,
+                    version=package_verison,
+                    bucket=s3_bucket_name,
+                    s3_path=s3_path,
+                )
+
+        while len(missing_regions) > 0:
+            for region in missing_regions:
+                ssm_client = boto3.client("ssm", region_name=region, config=config)
+                try:
+                    document = ssm_client.describe_document(Name=package_name)[
+                        "Document"
+                    ]
+                    status = document["Status"]
+                    if status == "Active":
+                        logger.info(
+                            f"Distributor package: {package_name} {package_verison} successfully created in {region}."
+                        )
+                        missing_regions.remove(region)
+                        continue
+                    elif status == "Failed":
+                        status_information = document["StatusInformation"]
+                        fail_response(
+                            f"Distributor package: {package_name} {package_verison} failed during creation in {region}. Reason: {status_information}"
+                        )
+                    else:
+                        logger.info(
+                            f"Distributor package: {package_name} {package_verison} is still being created in {region}."
+                        )
+                except ssm_client.exceptions.InvalidDocument:
+                    continue
+                except botocore.exceptions.ClientError as error:
+                    raise error
+
+            time.sleep(5)
+
+        if missing_regions == 0:
+            msg = (
+                f"Successfully created {package_name} {package_verison} in all regions."
+            )
+            logger.info(msg)
+            # cfnresponse.send(event, context, cfnresponse.SUCCESS, {"msg": msg})
+
+        else:
+            fail_response(
+                f"The following regions are still missing the distributor package: {"".join(missing_regions)}"
+            )
+
+    except Exception as e:
+        fail_response(e)
 
 
-def create_distributor_package(client, package_name, version, s3_bucket_name):
-    response = client.create_document(
+def fail_response(e):
+    responseData = {"error": str(e)}
+    logging.error(e)
+    # cfnresponse.send(event, context, cfnresponse.FAILED, responseData)
+    print(responseData)
+
+
+def sync_s3(s3_dir, s3_bucket_name, s3_path):
+    s3_client = boto3.client("s3")
+    for root, _, files in os.walk(s3_dir):
+        for file in files:
+            file_name = os.path.join(root, file)
+            logging.info(f"Uploading {file_name} to {s3_bucket_name}.")
+            s3_client.upload_file(
+                file_name, s3_bucket_name, os.path.join(s3_path, file_name)
+            )
+
+
+def create_distributor_package(
+    client, package_name, manifest, version, bucket, s3_path
+):
+    client.create_document(
         Name=package_name,
         VersionName=version,
         DocumentType="Package",
+        Content=json.dumps(manifest),
+        DocumentFormat="JSON",
         Attachments=[
             {
                 "Key": "SourceUrl",
-                "Values": [f"s3://{s3_bucket_name}/package_name/{version}"],
+                "Values": [f"s3://{bucket}/{s3_path}"],
             }
         ],
     )
@@ -132,6 +222,9 @@ def create_local_packages(version):
             manifest_data["files"][zip_file_name] = {
                 "checksums": {"sha256": get_digest(zip_file_path)}
             }
+
+            with open(os.path.join(s3_dir, "manifest.json"), "w") as file:
+                json.dump(manifest_data, file, indent=4)
 
             return s3_dir, manifest_data
 
@@ -983,13 +1076,13 @@ if ($agentService -and $agentService.Status -eq 'Running') {
 }
 
 # Checks if the CrowdStrike registry key was successfully removed and throws an exception if it still exists
-if (Test-Path -Path HKLM:\System\Crowdstrike) {
+if (Test-Path -Path HKLM:\\System\\Crowdstrike) {
   Write-Output 'CrowdStrike registry key still exists. Uninstall failed.'
   exit 1
 }
 
 # Checks if the CrowdStrike driver was successfully removed and throws an exception if it still exists
-if (Test-Path -Path "${env:SYSTEMROOT}\System32\drivers\CrowdStrike") {
+if (Test-Path -Path "${env:SYSTEMROOT}\\System32\\drivers\\CrowdStrike") {
   Write-Output 'CrowdStrike driver still exists. Uninstall failed.'
   exit 1
 }
