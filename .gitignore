@@ -35,3 +35,5 @@ terraform.rc
 
 # Ignore others
 .terraform.lock.hcl
+.DS_Store
+.venv

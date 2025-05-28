@@ -1,0 +1,22 @@
+---
+name: Release
+on: push
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Build packages
+        run: python3 custom-api-package/package/packager.py -v ${{github.ref_name}}
+      - name: release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: custom-api-package/package/builds/custom-api-package.zip

@@ -1,383 +1,154 @@
-"""CrowdStrike AWS Distributor Packaging utility.
-
-This example demonstrates creating a bundled Falcon Sensor
-distributor package within AWS Systems Manager.
-"""
 import argparse
-import hashlib
-import json
-import logging
 import os
-import shutil
-import sys
-import time
-import zipfile
-from functools import cached_property
-from logging.handlers import RotatingFileHandler
+import logging
 from os.path import basename
-
-import boto3
-from botocore.exceptions import BotoCoreError, ClientError
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger()
-handler = logging.StreamHandler()
-formatter = logging.Formatter("%(levelname)-8s %(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
-
-PATH_TO_BUCKET_FOLDER = "./s3-bucket/"
-PACKAGE_DESCRIPTION = "CrowdStrike custom Install Package"
-INSTALLER_VERSION = "1.0"
-OS_LIST = ["windows", "linux"]
+import zipfile
+import json
+import hashlib
 
 
-class SSMPackageUpdater:  # pylint: disable=R0903
-    """Class to represent our SSM package update."""
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
-    def __init__(self, region_name):
-        self.region = region_name
+FILTER_KEYWORD = "<<SENSOR_DOWNLOAD_FILTER>>"
+PACKAGE_MANAGER_KEYWORD = "<<PACKAGE_MANAGER>>"
 
-    def update(self, package, file_to_upload):
-        """Update the SSM package."""
-        with open(file_to_upload, "r", encoding="utf-8") as open_file:
-            document_content = open_file.read()
-        self._doc_update_or_create(
-            Content=document_content,
-            Attachments=[
-                {
-                    "Key": "SourceUrl",
-                    "Values": [
-                        "https://"
-                        + s3bucket
-                        + ".s3-"
-                        + self.region
-                        + ".amazonaws.com/falcon",
-                    ],
-                },
-            ],
-            Name=package,
-            DocumentType="Package",
-            DocumentFormat="JSON",
-        )
+root_dir = os.path.dirname(__file__)
 
-        print(f"Created ssm package {package}:")
 
-    def _doc_update_or_create(self, **kwargs):
-        """Determine if this is an update or create."""
-        if self._doc_exists(kwargs["Name"]):
-            self._doc_update(**kwargs)
+def main():
+    parser = argparse.ArgumentParser(
+        "This script creates the distribor package .zip files, and generates a manifest.json file that can be used to create the custom api distributor package."
+    )
+    parser.add_argument(
+        "--version", "-v", help="The version of the distributor package.", required=True
+    )
+    args = parser.parse_args()
+
+    package_version = args.version
+    logger.info(f"Creating custom-api distribtor package version: {package_version}")
+
+    distros = {}
+    with open(os.path.join(root_dir, "distros.json"), "r") as distro_file:
+        distros = json.load(distro_file)
+
+    if len(distros) == 0:
+        raise ValueError("Expected distros.json to contain distro information.")
+
+    manifest_data = {
+        "schemaVersion": "2.0",
+        "publisher": "Crowdstrike Inc.",
+        "description": "The CrowdStrike Falcon cloud platform helps successfully stop breaches, all via a single lightweight agent. Learn how to protect your AWS environment with CrowdStrike at https://github.com/CrowdStrike/aws-ssm-distributor/tree/main/custom-api-package",
+        "version": package_version,
+        "packages": {},
+        "files": {},
+    }
+    base_build_dir = os.path.join(root_dir, "builds")
+
+    for platform in distros:
+        if platform == "linux":
+            install_script = os.path.join(root_dir, "./linux/install.sh")
+            uninstall_script = os.path.join(root_dir, "./linux/uninstall.sh")
+            file_ext = ".sh"
         else:
-            self._client.create_document(**kwargs)
+            install_script = os.path.join(root_dir, "./windows/install.ps1")
+            uninstall_script = os.path.join(root_dir, "./windows/uninstall.ps1")
+            file_ext = ".ps1"
 
-    def _doc_exists(self, package):
-        """Document exists."""
-        try:
-            current_doc = self._client.get_document(Name=package)
-        except self._client.exceptions.InvalidDocument:
-            current_doc = {}
-        return current_doc
+        for distro in distros[platform]:
+            name = distro["name"]
+            version = distro["version"]
+            arch = distro["arch"]
+            logger.info("Creating package for {} {} {}".format(name, version, arch))
+            distro_dir = "{}{}-{}".format(
+                name, version.replace(".*", "").replace("_any", ""), arch
+            )
+            package_dir = f"{base_build_dir}/package/{distro_dir}"
 
-    def _doc_update(self, **kwargs):
-        """Perform the document update."""
-        del kwargs["DocumentType"]
-        kwargs["DocumentVersion"] = "$LATEST"
-        try:
-            updated = self._client.update_document(**kwargs)
-        except self._client.exceptions.DuplicateDocumentContent:
-            print("AWS SSM Package is already up to date with the latest version")
-            return
-        except self._client.exceptions.DocumentVersionLimitExceeded:
-            self._doc_cleanup_versions(kwargs["Name"])
-            updated = self._client.update_document(**kwargs)
-
-        self._client.update_document_default_version(
-            Name=kwargs["Name"],
-            DocumentVersion=updated["DocumentDescription"]["DocumentVersion"],
-        )
-
-    def _doc_cleanup_versions(self, package):
-        """Cleanup document versions."""
-        for version in self._client.list_document_versions(Name=package)[
-            "DocumentVersions"
-        ]:
-            if version["IsDefaultVersion"]:
-                continue
-            self._client.delete_document(
-                Name=package, DocumentVersion=version["DocumentVersion"]
+            write_package_script(
+                install_script,
+                f"{package_dir}/install{file_ext}",
+                distro["filter"],
+                distro["package_manager"],
             )
 
-    @cached_property
-    def _client(self):
-        """Return an instance of the SSM boto3 client."""
-        return boto3.client("ssm", region_name=self.region)
-
-
-class S3BucketUpdater:  # pylint: disable=R0903
-    """Class to represent our S3 Bucket update."""
-
-    def __init__(self, region_name):
-        self.region = region_name
-
-    def update(self, bucket_name, file_list, prefix=""):
-        """Update the bucket contents."""
-        if not self._bucket_exists(bucket_name):
-            self._create_bucket(bucket_name)
-        for file in file_list:
-            file_path = PATH_TO_BUCKET_FOLDER + file
-            self._upload_file(file_path, bucket_name, prefix + file)
-
-    def _bucket_exists(self, bucket_name):
-        """
-        Checks that the S3 bucket exists in the region
-        :param bucket_name: The name of the S3 bucket
-        :return: True or False
-        """
-        try:
-            response = self._client.list_buckets()
-        except ClientError as err:
-            print(f"Error listing buckets {err}")
-
-        # Output True if bucket exists
-
-        for bucket in response["Buckets"]:
-            if bucket_name == bucket["Name"]:
-                print("Bucket already exists:")
-                return True
-        return False
-
-    def _create_bucket(self, bucket_name):
-        """Create an S3 bucket
-
-        :param bucket_name: Bucket to create
-        :return: True if bucket created, else False
-        """
-
-        print("Creating bucket:")
-        location = {"LocationConstraint": self.region}
-        self._client.create_bucket(
-            Bucket=bucket_name, CreateBucketConfiguration=location
-        )
-
-    def _upload_file(self, file_name, bucket, object_name=None):
-        """Upload a file to an S3 bucket
-
-        :param file_name: File to upload
-        :param bucket: Bucket to upload to
-        :param object_name: S3 object name. If not specified then file_name is used
-        :return: True if file was uploaded, else False
-        """
-        # If S3 object_name was not specified, use file_name
-        if object_name is None:
-            object_name = file_name
-
-        try:
-            start_time = time.time()
-            print(f"Uploading file {file_name}:")
-            with open(file_name, "rb") as content:
-                self._client.put_object(Bucket=bucket, Key=object_name, Body=content)
-            time_taken = time.time() - start_time
-            print(
-                f"Successfully finished uploading files to s3 bucket. Took {time_taken}s"
+            write_package_script(
+                uninstall_script,
+                f"{package_dir}/uninstall{file_ext}",
+                distro["filter"],
+                distro["package_manager"],
             )
-        except (BotoCoreError, ClientError) as err:
-            print(f"Upload error {err}")
-            return False
-        return True
 
-    @cached_property
-    def _client(self):
-        return boto3.client("s3", region_name=self.region)
+            zip_file_path = zip_package(package_dir, distro_dir, base_build_dir)
+            zip_file_name = os.path.basename(zip_file_path)
+
+            if not name in manifest_data["packages"]:
+                manifest_data["packages"][name] = {}
+            if not version in manifest_data["packages"][name]:
+                manifest_data["packages"][name][version] = {}
+            if not arch in manifest_data["packages"][name][version]:
+                manifest_data["packages"][name][version][arch] = {}
+
+            manifest_data["packages"][name][version][arch] = {"file": zip_file_name}
+            manifest_data["files"][zip_file_name] = {
+                "checksums": {"sha256": get_digest(zip_file_path)}
+            }
+
+            with open(f"{base_build_dir}/s3/manifest.json", "w") as file:
+                json.dump(manifest_data, file, indent=4)
+
+            logger.info("Building custom-api-package.zip")
+            with zipfile.ZipFile(
+                f"{base_build_dir}/custom-api-package.zip", "w", zipfile.ZIP_DEFLATED
+            ) as package_zip:
+                for root, _, files in os.walk(os.path.join(base_build_dir, "s3")):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        package_zip.write(file_path, basename(file_path))
 
 
-class DistributorPackager:  # pylint: disable=R0903
-    """Class to represent a Distributor package."""
+def zip_package(package_dir, zip_name, base_build_dir):
+    zip_package_name = f"{base_build_dir}/s3/{zip_name}.zip"
+    logger.info(f"Creating zip file: {zip_package_name}")
+    directory = os.path.dirname(zip_package_name)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
 
-    def build(self, mappings_file):
-        """Build the package."""
-        dirs = set()
-        file_list = set()
-        # arch = set()
+    with zipfile.ZipFile(zip_package_name, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for root, _, files in os.walk(package_dir):
+            for file in files:
+                file_path = os.path.join(root, file)
+                zipf.write(file_path, basename(file_path))
 
-        installer_list = self._parse_mappings(mappings_file)
-        dir_list = os.listdir()
+    return zip_package_name
 
-        for os_type in OS_LIST:
-            for installer in installer_list[os_type]:
-                dirs.add(installer["dir"])
-                file_list.add(installer["file"])
 
-        folders_exist = all(item in dir_list for item in dirs)
-        if not folders_exist:
-            print("Check agent list file - Required directories do not exist")
-            sys.exit(1)
-        for directory in dirs:
-            self._create_zip_files(directory)
-        hashes_list = self._get_digest(file_list)
-        self._generate_manifest(installer_list, hashes_list)
-        file_list.add("manifest.json")
-        return file_list
+def write_package_script(source, dest, filter, package_manager):
+    directory = os.path.dirname(dest)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+    with open(source, "rt") as fin, open(dest, "wt") as fout:
+        for line in fin:
+            fout.write(
+                line.replace(FILTER_KEYWORD, filter).replace(
+                    PACKAGE_MANAGER_KEYWORD, package_manager
+                )
+            )
 
-    @classmethod
-    def _parse_mappings(cls, filename):
-        """
-        :param filename: Name of the file
-        :return: Returns a dictionary containing required configuration data
-        """
-        with open(filename, "rb") as file_handle:
-            json_data = json.loads(file_handle.read())
-        return json_data
 
-    @staticmethod
-    def _generate_manifest(
-        zip_distros_meta_list, hashes
-    ):  # pylint: disable=R0914, R0912
-        """
-        Generates the manifest.json file required to create the ssm document
-        :param installer_list: List containing key value pairs required to construct the file
-        :param hashes: list of dictionary items {filename : sha256hash}
-        :return:
-        """
-        manifest_dict = {}
-        manifest_packages_meta = {}
-        manifest_dict = {
-            "schemaVersion": "2.0",
-            "publisher": "Crowdstrike Inc.",
-            "description": PACKAGE_DESCRIPTION,
-            "version": INSTALLER_VERSION,
-        }
-        # manifest_files_meta = {}
-        for os_type in OS_LIST:
-            for each_zip_distro_meta in zip_distros_meta_list[os_type]:
-                name = each_zip_distro_meta["name"]
-                arch_type = each_zip_distro_meta["arch_type"]
-                version = each_zip_distro_meta["major_version"]
-                if not len(each_zip_distro_meta["minor_version"]) == 0:
-                    version = version + "." + each_zip_distro_meta["minor_version"]
+def get_digest(file):
+    h = hashlib.sha256()
 
-                if name in manifest_packages_meta:
-                    pass
-                else:
-                    manifest_packages_meta[name] = {}
-
-                if version in manifest_packages_meta[name]:
-                    pass
-                else:
-                    manifest_packages_meta[name][version] = {}
-
-                if arch_type in manifest_packages_meta[name][version]:
-                    pass
-                else:
-                    manifest_packages_meta[name][version][arch_type] = {}
-
-                manifest_packages_meta[name][version][arch_type] = {
-                    "file": each_zip_distro_meta["file"]
-                }
-
-        try:
-            manifest_dict["packages"] = manifest_packages_meta
-            obj = {}
-            for hash_val in hashes:
-                for key, val in hash_val.items():
-                    obj.update({key: {"checksums": {"sha256": val}}})
-            # print(obj)
-            file_list = {"files": obj}
-            manifest_dict.update(file_list)
-        except (KeyError, ValueError) as err:
-            print(f"Exception {err}")
-        try:
-            with open(
-                (PATH_TO_BUCKET_FOLDER + "manifest.json"), "w", encoding="utf-8"
-            ) as file:
-                file.write(json.dumps(manifest_dict))
-        except (FileNotFoundError, FileExistsError, OSError) as err:
-            print(err)
-
-    @staticmethod
-    def _create_zip_files(directory):
-        """Create a zip file from the contents of the specified directory."""
-        with zipfile.ZipFile(
-            PATH_TO_BUCKET_FOLDER + directory + ".zip", "w", zipfile.ZIP_DEFLATED
-        ) as zipf:
-            for root, _, file_list in os.walk(directory + "/"):
-                for file in file_list:
-                    file_path = os.path.join(root, file)
-                    zipf.write(file_path, basename(file_path))
-
-    @staticmethod
-    def _get_digest(file_list):
-        """
-        Generate sha256 of hash
-        :param files:
-        :return:
-        """
-        hashes = []
-        for file in file_list:
-            file_path = PATH_TO_BUCKET_FOLDER + file
-            with open(file_path, "rb") as file_handle:
-                read_bytes = file_handle.read()  # read entire file as bytes
-                readable_hash = hashlib.sha256(read_bytes).hexdigest()
-                hashes.append({file: readable_hash})
-        return hashes
+    with open(file, "rb") as file:
+        while True:
+            chunk = file.read(h.block_size)
+            if not chunk:
+                break
+            h.update(chunk)
+        return h.hexdigest()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Create and upload Distributor packages to the AWS SSM"
-    )
-    parser.add_argument(
-        "-r",
-        "--aws_region",
-        help="The aws region to create the ssm distributor package in.",
-    )
-    parser.add_argument(
-        "-p",
-        "--package_name",
-        help="The name of the distributor package to create.",
-        default="CrowdStrike-FalconSensor",
-    )
-    parser.add_argument(
-        "-b",
-        "--s3bucket",
-        help="The name of the s3 bucket to upload the required files to.",
-    )
-
-    args = parser.parse_args()
-
-    region = args.aws_region
-    package_name = args.package_name
-    s3bucket = args.s3bucket
-
-
-    if not os.path.exists(PATH_TO_BUCKET_FOLDER):
-        os.makedirs(PATH_TO_BUCKET_FOLDER)
-
-    files = DistributorPackager().build("agent_list.json")
-
-    if region is None or s3bucket is None:
-        print(
-            "Skipping AWS upload: please provide --aws_region, --ssm_automation_doc_name, and --s3bucket command-line "
-            "options for upload"
-        )
-
-    S3BucketUpdater(region).update(s3bucket, files, "falcon/")
-    print("Package file have been built and uploaded successfully.")
-
-    if package_name is not None:
-        SSMPackageUpdater(region).update(
-            package_name, PATH_TO_BUCKET_FOLDER + "manifest.json"
-        )
-        print("Distributor package has been built successfully.")
-
-    # loop over PATH_TO_BUCKET_FOLDER and upload all files to S3 that are not in files list
-    supporting_files = []
-    for file in os.listdir(PATH_TO_BUCKET_FOLDER):
-        if file not in files:
-            supporting_files.append(file)
-
-    if len(supporting_files) > 0:
-        S3BucketUpdater(region).update(s3bucket, supporting_files)
-
-    print("Cleaning up files...")
-    shutil.rmtree(PATH_TO_BUCKET_FOLDER)
+    main()

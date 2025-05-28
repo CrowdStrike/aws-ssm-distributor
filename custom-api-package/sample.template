@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "AllowLogs"
+          PolicyDocument:
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:*"
+                Resource: "*"
+  CFNWaiter:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.9 
+      Timeout: 900
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile:
+          !Sub |
+          import json
+          import cfnresponse
+          import boto3
+
+          def handler(event, context):
+            wait_seconds = 0
+            id = str(uuid.uuid1())
+            if event["RequestType"] in ["Create", "Update"]:
+              wait_seconds = int(event["ResourceProperties"].get("WaitSeconds", 0))
+              sleep(wait_seconds)
+            response = {
+              "TimeWaited": wait_seconds,
+              "Id": id 
+            }
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, response, "Waiter-"+id)
+  CFNWaiterCustomResource:
+    Type: "AWS::CloudFormation::CustomResource"
+    Properties:
+      ServiceTimeout: 900
+      ServiceToken: !GetAtt CFNWaiter.Arn
+      WaitSeconds: 60
+​
+Outputs:
+  TimeWaited:
+    Value: !GetAtt CFNWaiterCustomResource.TimeWaited
+    Export:
+      Name: TimeWaited
+  WaiterId:
+    Value: !GetAtt CFNWaiterCustomResource.Id
+    Export:
+      Name: WaiterId
