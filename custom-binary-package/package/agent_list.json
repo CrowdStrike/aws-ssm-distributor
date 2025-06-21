@@ -151,6 +151,14 @@
       "arch_type": "x86_64"
     },
     {
+      "dir": "CS_ORACLE9_x86_64",
+      "file": "CS_ORACLE9_x86_64.zip",
+      "name": "oracle",
+      "major_version": "9",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
       "dir": "CS_SLES12_x86_64",
       "file": "CS_SLES12_x86_64.zip",
       "name": "suse",

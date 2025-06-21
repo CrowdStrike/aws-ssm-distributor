@@ -136,6 +136,11 @@ binary_list = [
         "filter": "os:'*Oracle*'+os_version:'8'+platform:'linux'",
     },
     {
+        "path": "CS_ORACLE9_x86_64/falcon-sensor.rpm",
+        "installer": "yum",
+        "filter": "os:'*Oracle*'+os_version:'9'+platform:'linux'",
+    },
+    {
         "path": "CS_SLES12_x86_64/falcon-sensor.rpm",
         "installer": "zypper",
         "filter": "os:'*SLES*'+os_version:'12'+platform:'linux'",
