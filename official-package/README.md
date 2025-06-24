@@ -27,9 +27,11 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 | AlmaLinux 9                                              | x86_64, arm64 |
 | CentOS 7                                                 | x86_64        |
 | CentOS 8                                                 | x86_64, arm64 |
+| CentOS 9                                                 | x86_64, arm64 |
 | Oracle Enterprise Linux 6                                | x86_64        |
 | Oracle Enterprise Linux 7                                | x86_64        |
 | Oracle Enterprise Linux 8                                | x86_64        |
+| Oracle Enterprise Linux 9                                | x86_64        |
 | SUSE Linux Enterprise Server 12                          | x86_64        |
 | SUSE Linux Enterprise Server 15                          | x86_64        |
 | Ubuntu 16.04                                             | x86_64        |
