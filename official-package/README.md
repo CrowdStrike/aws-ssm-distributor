@@ -27,7 +27,7 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 | AlmaLinux 9                                              | x86_64, arm64 |
 | CentOS 7                                                 | x86_64        |
 | CentOS 8                                                 | x86_64, arm64 |
-| CentOS 9                                                 | x86_64, arm64 |
+| CentOS 9                                                 | x86_64        |
 | Oracle Enterprise Linux 6                                | x86_64        |
 | Oracle Enterprise Linux 7                                | x86_64        |
 | Oracle Enterprise Linux 8                                | x86_64        |

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Support for CentOS 9 (x86_64, arm64)
+- Support for CentOS 9 (x86_64)
 - Support for Oracle Enterprise Linux 9 (x86_64)
 
 ## [v2.0.0] - 12-02-2024
