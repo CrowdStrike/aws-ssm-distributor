@@ -5,6 +5,14 @@
 > Please ensure you are using version `3` of the automation document to prevent any interruptions. Version `3` of out automation document also introduced the consolidated distributor package and reduces the overall cost of using the Official AWS Distributor Package.
 > Learn more on how to migrate in the [Consolidated Package Migration Guide](./migrate.md).
 
+## Cost Considerations
+
+Using AWS Systems Manager State Manager associations with the automation document incurs costs based on automation steps executed.
+
+For detailed cost analysis and optimization strategies, see the [full cost documentation](./COST-DOCUMENTATION.md).
+
+---
+
 This deployment guide outlines the steps required to use the published third party distributor package in AWS. This method prevents the need to build your own packages and publish your own SSM automation documents to AWS.
 
 If you have a question checkout the [FAQ](#faq) to see if it has already been answered. If it has not been answered in the FAQ, please open an [issue](https://github.com/CrowdStrike/aws-ssm-distributor/issues/new/choose) and we will happily help.
