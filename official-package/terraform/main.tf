@@ -45,8 +45,11 @@ resource "aws_iam_role" "ssm_assume_role" {
       }
     ]
   })
+}
 
-  managed_policy_arns = lower(var.secret_storage_method) == "secretsmanager" ? [
+resource "aws_iam_role_policy_attachments_exclusive" "ssm_assume_role" {
+  role_name   = aws_iam_role.ssm_assume_role.name
+  policy_arns = lower(var.secret_storage_method) == "secretsmanager" ? [
     "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole",
     "arn:aws:iam::aws:policy/SecretsManagerReadWrite",
     ] : [

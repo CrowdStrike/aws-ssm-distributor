@@ -63,8 +63,8 @@ terraform apply --var-file='terraform.tfvars'
 
 | Name                                                                                               | Version  |
 | -------------------------------------------------------------------------------------------------- | -------- |
-| <a name="provider_aws"></a> [aws](https://registry.terraform.io/providers/hashicorp/aws/latest)    | ~> 5.0.0 |
-| <a name="provider_time"></a> [time](https://registry.terraform.io/providers/hashicorp/time/latest) | n/a      |
+| <a name="provider_aws"></a> [aws](https://registry.terraform.io/providers/hashicorp/aws/latest)    | >= 5.0.0, ~> 6.0   |
+| <a name="provider_time"></a> [time](https://registry.terraform.io/providers/hashicorp/time/latest) | >= 1.0.0      |
 ## Inputs
 
 | Name                                    | Description                                                                                                                                      | Type           | Default                              | Required |
