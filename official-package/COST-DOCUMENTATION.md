@@ -1,6 +1,6 @@
 # Cost Documentation for AWS Systems Manager State Manager Associations
 
-> ![IMPORTANT]
+> [!IMPORTANT]
 > The cost estimates provided in this document are based on AWS pricing as of June 26, 2025, and are intended as examples only. Actual costs may vary based on your specific usage patterns, and any changes to AWS pricing. For the most current pricing information, refer to the [AWS Systems Manager Pricing](https://aws.amazon.com/systems-manager/pricing/) page.
 
 This document outlines the cost considerations when using AWS Systems Manager State Manager associations to deploy the CrowdStrike Falcon Sensor across your AWS environment.
