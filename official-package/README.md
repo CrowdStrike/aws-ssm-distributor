@@ -451,9 +451,7 @@ CrowdStrike Falcon Sensor upgrades and downgrades should be handled by update po
 - us-west-2
 - il-central-1
 
-If a region you need is not supported you can still use the [custom-binary-package](../custom-binary-package) or [custom-api-package](../custom-api-package) to install the sensor.
-
-If you would like to request support for a region, please reach out to your CrowdStrike representative.
+While we have comprehensive regional coverage, AWS occasionally adds new regions. If you find that we're missing support for a newly added region that you need, please open a GitHub issue and we will add support for it.
 </details>
 
 ### Where is the `CrowdStrike-FalconSensorDeploy` automation document?
