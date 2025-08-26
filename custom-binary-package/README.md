@@ -1,5 +1,8 @@
 # Custom AWS Distributor Package using Sensor Binaries
 
+> [!IMPORTANT]
+> **This package is deprecated and should not be used.** As of version v2.2.0 and later, the [official CrowdStrike Distributor Package](../official-package/README.md) supports all AWS regions including GovCloud and is the only supported solution. While we have comprehensive regional coverage, AWS occasionally adds new regions. If you find that we're missing support for a newly added region that you need, please open a GitHub issue and we will add support for it. For a complete list of currently supported regions, see the [official package FAQ](../official-package/README.md#what-aws-regions-are-supported).
+
 This deployment guide outlines the steps required to build your own distributor package that bundles the CrowdStrike Falcon sensor binaries for Linux and Windows.
 
 ## Requirements
@@ -20,9 +23,9 @@ We will use the CrowdStrike API to download the sensor binaries that will be bun
 1. In the CrowdStrike console, navigate to **Support and resources** > **API Clients & Keys**. Click **Add new API Client**.
 2. Add the following api scopes:
 
-    | Scope               | Permission | Description                                                                  |
-    | ------------------- | ---------- | ---------------------------------------------------------------------------- |
-    | Sensor Download     | *READ*     | Allows the helper python script to download the sensor binaries              |
+    | Scope           | Permission | Description                                                     |
+    | --------------- | ---------- | --------------------------------------------------------------- |
+    | Sensor Download | *READ*     | Allows the helper python script to download the sensor binaries |
 
 3. Click **Add** to create the API client. The next screen will display the API **CLIENT ID**, **SECRET**, and **BASE URL**. You will need all three for the next step.
 
@@ -79,14 +82,14 @@ Once you've published the package you can use the `AWS-ConfigureAWSPackage` run 
 
 You can pass the following parameters to the `additional-arguments` parameter of the `AWS-ConfigureAWSPackage` run command to modify the default behavior of the package:
 
-| Parameter | Description | Required |
-| --------- | ----------- | -------- |
-| SSM_CID | The CID of the CrowdStrike Falcon console to connect to. | Yes |
-| SSM_INSTALLTOKEN | The install token to use when installing the sensor. | No |
-| SSM_WIN_INSTALLPARAMS | The install parameters to use when installing the sensor on Windows. (Excluding CID) | No |
-| SSM_WIN_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Windows. | No |
-| SSM_LINUX_INSTALLPARAMS | The install parameters to use when installing the sensor on Linux. (Excluding CID) | No |
-| SSM_LINUX_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Linux. | No |
+| Parameter                 | Description                                                                          | Required |
+| ------------------------- | ------------------------------------------------------------------------------------ | -------- |
+| SSM_CID                   | The CID of the CrowdStrike Falcon console to connect to.                             | Yes      |
+| SSM_INSTALLTOKEN          | The install token to use when installing the sensor.                                 | No       |
+| SSM_WIN_INSTALLPARAMS     | The install parameters to use when installing the sensor on Windows. (Excluding CID) | No       |
+| SSM_WIN_UNINSTALLPARAMS   | The uninstall parameters to use when uninstalling the sensor on Windows.             | No       |
+| SSM_LINUX_INSTALLPARAMS   | The install parameters to use when installing the sensor on Linux. (Excluding CID)   | No       |
+| SSM_LINUX_UNINSTALLPARAMS | The uninstall parameters to use when uninstalling the sensor on Linux.               | No       |
 
 ### Example
 
