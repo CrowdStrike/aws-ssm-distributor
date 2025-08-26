@@ -1,6 +1,7 @@
 # Custom AWS Distributor Package using Sensor Binaries
 
-> IMPORTANT: **This package is deprecated and should not be used.** As of version v2.2.0 and later, the [official CrowdStrike Distributor Package](../official-package/README.md) supports all AWS regions including GovCloud and is the only supported solution. While we have comprehensive regional coverage, AWS occasionally adds new regions. If you find that we're missing support for a newly added region that you need, please open a GitHub issue and we will add support for it. For a complete list of currently supported regions, see the [official package FAQ](../official-package/README.md#what-aws-regions-are-supported).
+> [!IMPORTANT]
+> **This package is deprecated and should not be used.** As of version v2.2.0 and later, the [official CrowdStrike Distributor Package](../official-package/README.md) supports all AWS regions including GovCloud and is the only supported solution. While we have comprehensive regional coverage, AWS occasionally adds new regions. If you find that we're missing support for a newly added region that you need, please open a GitHub issue and we will add support for it. For a complete list of currently supported regions, see the [official package FAQ](../official-package/README.md#what-aws-regions-are-supported).
 
 This deployment guide outlines the steps required to build your own distributor package that bundles the CrowdStrike Falcon sensor binaries for Linux and Windows.
 
