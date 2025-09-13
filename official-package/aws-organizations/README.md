@@ -18,16 +18,61 @@ This deployment provisions the following in each region:
 
 ```bash
 # Build
-build --config-file samconfig.toml 
+sam build --config-file samconfig.toml 
 
 # Deploy:
-deploy --config-file samconfig.toml
+sam deploy --config-file samconfig.toml
 
 # Delete:
-delete --config-file samconfig.toml
+sam delete --config-file samconfig.toml
 ```
 
 Check out [Parameters](#parameters) for more information on the available variables.
+
+### Example Configurations
+
+The following examples show how to configure different targeting options in your `samconfig.toml` file:
+
+#### Target All Instances (Default)
+```toml
+# In samconfig.toml
+parameter_overrides=[
+  # ... other parameters ...
+  "TargetKey=InstanceIds",
+  "TargetValues=*"
+]
+```
+*Note: This is the default behavior - if you omit TargetKey and TargetValues, these values will be used automatically.*
+
+#### Target Specific Tag and Value
+```toml
+# In samconfig.toml
+parameter_overrides=[
+  # ... other parameters ...
+  "TargetKey=tag:Environment",
+  "TargetValues=Production,Staging"
+]
+```
+
+#### Target Resource Group
+```toml
+# In samconfig.toml
+parameter_overrides=[
+  # ... other parameters ...
+  "TargetKey=ResourceGroup",
+  "TargetValues=MyResourceGroup"
+]
+```
+
+#### Target Specific Instance IDs
+```toml
+# In samconfig.toml
+parameter_overrides=[
+  # ... other parameters ...
+  "TargetKey=InstanceIds",
+  "TargetValues=i-1234567890abcdef0,i-0987654321fedcba0"
+]
+```
 
 ## Parameters
 
