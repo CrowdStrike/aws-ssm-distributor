@@ -35,3 +35,6 @@ terraform.rc
 
 # Ignore others
 .terraform.lock.hcl
+
+# AWS SAM
+.aws-sam/
