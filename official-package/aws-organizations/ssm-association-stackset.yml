@@ -60,6 +60,15 @@ Parameters:
   WindowsPackageVersion:
     Type: String
     Default: ""
+  TargetKey:
+    Description: The key for targeting instances. Can be InstanceIds, tag:TagKey, or ResourceGroup.
+    Type: String
+    Default: "InstanceIds"
+    AllowedPattern: "^(InstanceIds|tag:.+|ResourceGroup)$"
+  TargetValues:
+    Description: The values for the target key. For InstanceIds use '*' for all or specific instance IDs. For tags use tag values. For ResourceGroup use the resource group name.
+    Type: CommaDelimitedList
+    Default: "*"
 
 Resources:
   CrowdStrikeSSMAssociation:
@@ -69,9 +78,8 @@ Resources:
       AssociationName: "crowdstrike-falcon-sensor-deploy"
       AutomationTargetParameterName: "InstanceIds"
       Targets:
-        - Key: InstanceIds
-          Values:
-            - "*"
+        - Key: !Ref TargetKey
+          Values: !Ref TargetValues
       Parameters:
         AutomationAssumeRole:
           - !Sub arn:aws:iam::${AWS::AccountId}:role/${AutomationAssumeRole}
