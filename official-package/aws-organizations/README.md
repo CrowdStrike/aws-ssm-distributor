@@ -98,7 +98,7 @@ parameter_overrides=[
 | MaxConcurrency           | The maximum number of targets allowed to run the association at the same time. You can specify a number, for example 10, or a percentage of the target set, for example 10%.                                                                          | `string`       | `"20%"`                                 |   yes    |
 | ComplianceSeverity       | The severity level that is assigned to the association.                                                                                                                                                                                               | `string`       | `"UNSPECIFIED"`                         |   yes    |
 | TargetKey                | The key for targeting instances. Can be `InstanceIds`, `tag:TagKey`, or `ResourceGroup`.                                                                                                                                                              | `string`       | `"InstanceIds"`                         |    no    |
-| TargetValues             | The values for the target key. For InstanceIds use `*` for all or specific instance IDs. For tags use tag values. For ResourceGroup use the resource group name.                                                                                      | `list(string)` | `["*"]`                                 |    no    |
+| TargetValues             | The values for the target key. For InstanceIds use `*` for all or specific instance IDs. For tags use tag values. For ResourceGroup use the resource group name.                                                                                      | `list(string)` | `*`                                     |    no    |
 
 ## Uninstall
 
