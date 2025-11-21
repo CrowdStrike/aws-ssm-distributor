@@ -83,7 +83,7 @@ terraform apply --var-file='terraform.tfvars'
 | linux_installer_params                  | The parameters to pass to the Linux installer at install time.                                                                                   | `string`       | `""`                                 |    no    |
 | linux_package_version                   | The version of the CrowdStrike Falcon Sensor package to install on Linux. Installs N-1 version if no version is specified. Example `7.0.4.2333`   | `string`       | `""`                                 |    no    |
 | windows_installer_params                | The parameters to pass to the Windows installer at install time.                                                                                 | `string`       | `""`                                 |    no    |
-| windows_package_version                 | The version of the CrowdStrike Falcon Sensor package to install on Windows. Example 7.0.4.2333, installs N-1 version if no version is specified. | `string`       | `""`                                 |    no    |
+| windows_package_version                 | The version of the CrowdStrike Falcon Sensor package to install on Windows. Installs N-1 version if no version is specified. Example `7.0.4.2333` | `string`       | `""`                                 |    no    |
 ## Outputs
 
 | Name             | Description                                                      |
