@@ -1,5 +1,9 @@
 # Official AWS Distributor Package
 
+## Demo
+
+[![Demo of the AWS SSM Distributor Package](https://play.vidyard.com/xGheoUHy1QhhTcrQvgz2Bd.jpg)](https://vid.crowdstrike.com/watch/xGheoUHy1QhhTcrQvgz2Bd)
+
 > [!IMPORTANT]
 > AWS is decomissioning Python 3.7 which is currently used in `v1` and `v2` of the automation document used in our Official AWS Distributor Package.
 > Please ensure you are using version `3` of the automation document to prevent any interruptions. Version `3` of out automation document also introduced the consolidated distributor package and reduces the overall cost of using the Official AWS Distributor Package.
@@ -19,7 +23,7 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 
 ## Supported Operating Systems
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > The table below shows what operating systems the official distributor package supports. It is not a list of CrowdStrike supported sensors. Not all CrowdStrike supported sensors are supported by AWS SSM. See [AWS supported operating systems](https://docs.aws.amazon.com/systems-manager/latest/userguide/distributor.html#:~:text=platforms%20and%20architectures.-,Supported%20package%20platforms%20and%20architectures,-You%20can%20use) for more information.
 
 | Operating System                                         | Architecture  |
@@ -59,6 +63,7 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 ## Requirements
 
 ### AWS Systems Manager
+
 Distributor is a feature of AWS Systems Manager. In order to use the distributor package, you must first setup AWS Systems Manager. See the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-setting-up.html) for more information.
 
 > [!IMPORTANT]
@@ -144,14 +149,15 @@ You can use any secret name you like, as long as you pass in the secret name whe
 
     </p>
     </details>
-7. Fill in the optional fields if you want. Click **Next**. 
+7. Fill in the optional fields if you want. Click **Next**.
 8. Configure the optional rotation settings if you want. Click **Next**.
-9.  Review and click **Store**.
+9. Review and click **Store**.
+
 </details>
 
 <details><summary>Using the AWS CLI</summary>
 
-We can use the `aws secretsmanager create-secret` command to create the secret from the cli. See the [create-secret documentation](https://docs.aws.amazon.com/cli/latest/reference/secretsmanager/create-secret.html) for more information.  
+We can use the `aws secretsmanager create-secret` command to create the secret from the cli. See the [create-secret documentation](https://docs.aws.amazon.com/cli/latest/reference/secretsmanager/create-secret.html) for more information.
 
 The following command will create a secret named `/CrowdStrike/Falcon/Distributor` with the key/value pairs from the table above.
 
@@ -167,7 +173,6 @@ aws secretsmanager create-secret \
 
 </details>
 
-
 <details><summary>Using AWS Parameter Store</summary>
 To use Parameter Store as your secret backend, you must choose `ParameterStore` as the value for the `SecretStorageMethod` parameter when running the automation document: `CrowdStrike-FalconSensorDeploy`. There will be more information on this in the following sections.
 
@@ -180,6 +185,7 @@ The following parameters must be created:
 | /CrowdStrike/Falcon/Cloud        | The **BASE URL** from [Generate API Keys](#generate-api-keys).  | SecureString   |
 | /CrowdStrike/Falcon/ClientId     | The **CLIENT ID** from [Generate API Keys](#generate-api-keys). | SecureString   |
 | /CrowdStrike/Falcon/ClientSecret | The **SECRET** from [Generate API Keys](#generate-api-keys).    | SecureString   |
+
 > **Note:** These are the default parameter names the distributor package looks for. You can use any parameter name you want as long as you override the default values when creating the association in the next step.
 
 <details><summary>Using the AWS Console</summary>
@@ -205,7 +211,7 @@ aws ssm put-parameter \
     --value "CLIENT_ID"
 ```
 
-```bash 
+```bash
 aws ssm put-parameter \
     --name "/CrowdStrike/Falcon/ClientSecret" \
     --type "SecureString" \
@@ -213,6 +219,7 @@ aws ssm put-parameter \
     --region "us-east-1" \
     --value "SECRET"
 ```
+
 ```bash
 aws ssm put-parameter \
     --name "/CrowdStrike/Falcon/Cloud" \
@@ -225,7 +232,6 @@ aws ssm put-parameter \
 </p>
 </details>
 </details>
-
 
 ### Create AWS IAM Role
 
@@ -293,6 +299,7 @@ aws iam attach-role-policy \
     --role-name crowdstrike-distributor-deploy-role \
     --policy-arn arn:aws:iam::aws:policy/SecretsManagerReadWrite
 ```
+
 </details>
 
 ### Deploying the CrowdStrike Falcon Sensor
@@ -324,9 +331,8 @@ The automation document has the following parameters:
 > # Linux
 > --tags="Washington/DC_USA,Production" --aph=proxy.example.com --app=8080
 > # Windows
-> GROUPING_TAGS="Washington/DC_USA,Production" APP_PROXYNAME=proxy.example.com APP_PROXYPORT=8080 
+> GROUPING_TAGS="Washington/DC_USA,Production" APP_PROXYNAME=proxy.example.com APP_PROXYPORT=8080
 >```
-
 
 #### Example: Using Systems Manager Associations
 
@@ -352,7 +358,7 @@ For more information on State Manager, see the [AWS documentation](https://docs.
 3. Click `Install on a schedule`. This will redirect you to the `Create Association` page with the `CrowdStrike-FalconSensorDeploy` document preselected.
     > **Note**: This is the same as going to **AWS Systems Manager** > **Node Management** > **State Manager** > **Create Association** and selecting the `CrowdStrike-FalconSensorDeploy` document.
 4. Under **Document** choose **Default at runtime** for **Document Version** (the default document version will always be the most stable)
-5. Under **Execution** choose **Rate Control** 
+5. Under **Execution** choose **Rate Control**
     <details><summary>picture</summary>
     <p>
 
@@ -386,7 +392,7 @@ For more information on State Manager, see the [AWS documentation](https://docs.
 
     </p>
     </details>
-9.  Click **Create Association**.
+9. Click **Create Association**.
 
 </p>
 </details>
@@ -397,6 +403,7 @@ For more information on State Manager, see the [AWS documentation](https://docs.
 We can use the `aws ssm create-association` command to create the association from the CLI. See the [create-association documentation](https://docs.aws.amazon.com/cli/latest/reference/ssm/create-association.html) for more information.
 
 Here is an example of creating an association using the AWS CLI that targets all instances.
+
 ```bash
 aws ssm create-association \
     --name "CrowdStrike-FalconSensorDeploy" \
@@ -405,7 +412,7 @@ aws ssm create-association \
     --association-name "crowdstrike-falcon-sensor-deploy" \
     --automation-target-parameter-name "InstanceIds" \
     --region "us-east-1"
-``` 
+```
 
 For more information on each parameter, reference the parameters table in the [Deploying the CrowdStrike Falcon Sensor](#deploying-the-crowdstrike-falcon-sensor) section.
 
@@ -419,6 +426,7 @@ For more information on each parameter, reference the parameters table in the [D
 CrowdStrike Falcon Sensor upgrades and downgrades should be handled by update policies. The distributor package will not upgrade or downgrade the sensor. The distributor package should be used to install the sensor and then allow update policies to manage the sensor version.
 
 ### What AWS regions are supported?
+
 <details><summary>List of supported regions</summary>
 
 - af-south-1
