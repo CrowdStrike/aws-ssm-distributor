@@ -1,9 +1,35 @@
 # Custom AWS Distributor Package using Sensor Binaries
 
 > [!IMPORTANT]
-> **This package is deprecated and should not be used.** As of version v2.2.0 and later, the [official CrowdStrike Distributor Package](../official-package/README.md) supports all AWS regions including GovCloud and is the only supported solution. While we have comprehensive regional coverage, AWS occasionally adds new regions. If you find that we're missing support for a newly added region that you need, please open a GitHub issue and we will add support for it. For a complete list of currently supported regions, see the [official package FAQ](../official-package/README.md#what-aws-regions-are-supported).
+> As of version v2.2.0 and later, the [official CrowdStrike Distributor Package](../official-package/README.md) supports all AWS regions including GovCloud. The official third party package is the recommended path and will recieve updates quicker than the custom binary package. In cases where the official package can't be used this package can be used instead.
 
 This deployment guide outlines the steps required to build your own distributor package that bundles the CrowdStrike Falcon sensor binaries for Linux and Windows.
+
+## Custom Binary Package vs. Official API Package
+
+This custom binary package method differs from the [official package](../official-package/README.md) in how the sensor is delivered and installed:
+
+| Feature                  | Custom Binary Package                                           | Official Third-Part Package                                            |
+| ------------------------ | --------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Sensor Delivery**      | Sensor binaries are bundled directly in the distributor package | Sensors are downloaded from CrowdStrike API at install time            |
+| **API Interaction**      | CrowdStrike API only called once during package creation        | CrowdStrike API called on each instance during every install operation |
+| **Network Requirements** | Instances only need access to SSM.                              | Instances need access to CrowdStrike API endpoints                     |
+| **Version Control**      | Deploys specific sensor version bundled in package              | Deploys latest sensor version matching filter criteria                 |
+| **Region Support**       | Works in all AWS regions including GovCloud                     | Works in all AWS regions including GovCloud                            |
+| **Package Updates**      | Rebuild package to change deployed sensor version               | Automatically gets latest matching sensor without rebuild              |
+| **Maintenance**          | Rebuild required to change installed sensor version             | No maintenance - always uses latest published distributor package      |
+
+> [!NOTE]
+> Both methods do not perform automatic sensor updates. Sensor version updates should be managed using [CrowdStrike Sensor Update Policies](https://falcon.crowdstrike.com/documentation/page/o4c93228/sensor-update-policies).
+
+### When to Use Custom Binary Package
+
+Consider using this custom binary package method when:
+
+- Your instances cannot reach CrowdStrike API endpoints (air-gapped, restricted network)
+- You want to control the exact sensor version deployed
+- You want to avoid the `aws:executeScript` automation costs associated with the official package (see [official package cost documentation](../official-package/COST-DOCUMENTATION.md)) 
+
 
 ## Requirements
 You will need:

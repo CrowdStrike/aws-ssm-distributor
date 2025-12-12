@@ -106,11 +106,6 @@ binary_list = [
         "installer": "yum",
     },
     {
-        "path": "CS_CENTOS7_x86_64/falcon-sensor.rpm",
-        "installer": "yum",
-        "filter": "os:'*CentOS*'+os_version:'7'+platform:'linux'",
-    },
-    {
         "path": "CS_CENTOS8_x86_64/falcon-sensor.rpm",
         "installer": "yum",
         "filter": "os:'*CentOS*'+os_version:'8'+platform:'linux'",
@@ -119,11 +114,6 @@ binary_list = [
         "path": "CS_CENTOS8_ARM64/falcon-sensor.rpm",
         "installer": "yum",
         "filter": "os:'*CentOS*'+os_version:'8 - arm64'+platform:'linux'",
-    },
-    {
-        "path": "CS_ORACLE6_x86_64/falcon-sensor.rpm",
-        "installer": "yum",
-        "filter": "os:'*Oracle*'+os_version:'6'+platform:'linux'",
     },
     {
         "path": "CS_ORACLE7_x86_64/falcon-sensor.rpm",
