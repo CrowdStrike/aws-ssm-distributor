@@ -57,8 +57,6 @@ python_executable = shutil.which("python3")
 if not python_executable:
     python_executable = "python"
 
-print("Downloading required files...")
-
 binary_list = [
     {
         "filter": "os:'Amazon Linux'+os_version:'2'+platform:'linux'",
@@ -166,12 +164,35 @@ falcon = APIHarness(
     client_id=os.environ.get("FALCON_CLIENT_ID"),
     client_secret=os.environ.get("FALCON_CLIENT_SECRET"),
 )
+
+print("Downloading required files...")
+
 for binary in binary_list:
     sensors = falcon.command(
         action="GetCombinedSensorInstallersByQuery",
         filter=binary["filter"],
         sort="version.desc",
     )
+
+    if not isinstance(sensors, dict):
+        raise SystemExit(
+            f"API call failed for filter: {binary['filter']}. "
+            f"Expected dict response, got {type(sensors).__name__}."
+        )
+
+    if sensors.get("status_code") != 200:
+        error_msg = sensors.get("body", {}).get("errors", [{}])[0].get("message", "Unknown error")
+        raise SystemExit(
+            f"API error while querying sensors for filter: {binary['filter']}. "
+            f"Status code: {sensors.get('status_code')}, Error: {error_msg}"
+        )
+
+    if "body" not in sensors:
+        raise SystemExit(
+            f"API response missing 'body' for filter: {binary['filter']}. "
+            f"Full response: {sensors}"
+        )
+
     resources = sensors["body"].get("resources", [])
     if len(resources) == 0:
         raise SystemExit(
@@ -190,8 +211,18 @@ for binary in binary_list:
     print(f"Downloading {sensor_name} for {sensor_os} {sensor_os_version}")
 
     download = falcon.command(action="DownloadSensorInstallerById", id=sha)
+
+    if not download:
+        raise SystemExit(
+            f"Failed to download sensor {sensor_name}. The download returned empty content."
+        )
+
     if isinstance(download, dict):
-        raise SystemExit("Unable to download requested sensor.")
+        error_msg = download.get("body", {}).get("errors", [{}])[0].get("message", "Unknown error")
+        raise SystemExit(
+            f"API error while downloading sensor {sensor_name}. "
+            f"Status code: {download.get('status_code')}, Error: {error_msg}"
+        )
 
     os_dir = os.path.dirname(binary["path"])
     os.makedirs(os_dir, exist_ok=True)
