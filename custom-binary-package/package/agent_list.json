@@ -46,12 +46,22 @@
       "arch_type": "x86_64"
     },
     {
+      "id": "debian",
       "dir": "CS_DEBIAN_x86_64",
       "file": "CS_DEBIAN_x86_64.zip",
       "name": "debian",
       "major_version": "_any",
       "minor_version": "",
       "arch_type": "x86_64"
+    },
+    {
+      "id": "debian",
+      "dir": "CS_DEBIAN_ARM64",
+      "file": "CS_DEBIAN_ARM64.zip",
+      "name": "debian",
+      "major_version": "_any",
+      "minor_version": "",
+      "arch_type": "arm64"
     },
     {
       "id": "ubuntu",
@@ -103,6 +113,118 @@
       "arch_type": "arm64"
     },
     {
+      "dir": "CS_RHEL10_x86_64",
+      "file": "CS_RHEL10_x86_64.zip",
+      "name": "redhat",
+      "major_version": "10",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_RHEL10_ARM64",
+      "file": "CS_RHEL10_ARM64.zip",
+      "name": "redhat",
+      "major_version": "10",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
+      "dir": "CS_ALMALINUX8_x86_64",
+      "file": "CS_ALMALINUX8_x86_64.zip",
+      "name": "almalinux",
+      "major_version": "8",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_ALMALINUX8_ARM64",
+      "file": "CS_ALMALINUX8_ARM64.zip",
+      "name": "almalinux",
+      "major_version": "8",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
+      "dir": "CS_ALMALINUX9_x86_64",
+      "file": "CS_ALMALINUX9_x86_64.zip",
+      "name": "almalinux",
+      "major_version": "9",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_ALMALINUX9_ARM64",
+      "file": "CS_ALMALINUX9_ARM64.zip",
+      "name": "almalinux",
+      "major_version": "9",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
+      "dir": "CS_ALMALINUX10_x86_64",
+      "file": "CS_ALMALINUX10_x86_64.zip",
+      "name": "almalinux",
+      "major_version": "10",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_ALMALINUX10_ARM64",
+      "file": "CS_ALMALINUX10_ARM64.zip",
+      "name": "almalinux",
+      "major_version": "10",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
+      "dir": "CS_ROCKY8_x86_64",
+      "file": "CS_ROCKY8_x86_64.zip",
+      "name": "rocky",
+      "major_version": "8",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_ROCKY8_ARM64",
+      "file": "CS_ROCKY8_ARM64.zip",
+      "name": "rocky",
+      "major_version": "8",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
+      "dir": "CS_ROCKY9_x86_64",
+      "file": "CS_ROCKY9_x86_64.zip",
+      "name": "rocky",
+      "major_version": "9",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_ROCKY9_ARM64",
+      "file": "CS_ROCKY9_ARM64.zip",
+      "name": "rocky",
+      "major_version": "9",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
+      "dir": "CS_ROCKY10_x86_64",
+      "file": "CS_ROCKY10_x86_64.zip",
+      "name": "rocky",
+      "major_version": "10",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_ROCKY10_ARM64",
+      "file": "CS_ROCKY10_ARM64.zip",
+      "name": "rocky",
+      "major_version": "10",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
       "dir": "CS_CENTOS8_x86_64",
       "file": "CS_CENTOS8_x86_64.zip",
       "name": "centos",
@@ -119,12 +241,36 @@
       "arch_type": "arm64"
     },
     {
+      "dir": "CS_CENTOS9_x86_64",
+      "file": "CS_CENTOS9_x86_64.zip",
+      "name": "centos",
+      "major_version": "9",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_CENTOS10_x86_64",
+      "file": "CS_CENTOS10_x86_64.zip",
+      "name": "centos",
+      "major_version": "10",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
       "dir": "CS_ORACLE7_x86_64",
       "file": "CS_ORACLE7_x86_64.zip",
       "name": "oracle",
       "major_version": "7",
       "minor_version": "",
       "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_ORACLE7_ARM64",
+      "file": "CS_ORACLE7_ARM64.zip",
+      "name": "oracle",
+      "major_version": "7",
+      "minor_version": "",
+      "arch_type": "arm64"
     },
     {
       "dir": "CS_ORACLE8_x86_64",
@@ -143,6 +289,22 @@
       "arch_type": "x86_64"
     },
     {
+      "dir": "CS_ORACLE10_x86_64",
+      "file": "CS_ORACLE10_x86_64.zip",
+      "name": "oracle",
+      "major_version": "10",
+      "minor_version": "",
+      "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_ORACLE10_ARM64",
+      "file": "CS_ORACLE10_ARM64.zip",
+      "name": "oracle",
+      "major_version": "10",
+      "minor_version": "",
+      "arch_type": "arm64"
+    },
+    {
       "dir": "CS_SLES12_x86_64",
       "file": "CS_SLES12_x86_64.zip",
       "name": "suse",
@@ -157,6 +319,14 @@
       "major_version": "15",
       "minor_version": "",
       "arch_type": "x86_64"
+    },
+    {
+      "dir": "CS_SLES15_ARM64",
+      "file": "CS_SLES15_ARM64.zip",
+      "name": "suse",
+      "major_version": "15",
+      "minor_version": "",
+      "arch_type": "arm64"
     }
   ],
   "windows": [
