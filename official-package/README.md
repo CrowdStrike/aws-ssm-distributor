@@ -32,18 +32,23 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 | Amazon Linux 2023                                        | x86_64, arm64 |
 | Red Hat Enterprise Linux 7                               | x86_64        |
 | Red Hat Enterprise Linux 8                               | x86_64, arm64 |
-| Red Hat Enterprise Linux 9                               | x86_64        |
+| Red Hat Enterprise Linux 9                               | x86_64, arm64 |
+| Red Hat Enterprise Linux 10                              | x86_64, arm64 |
 | Rocky Linux 8                                            | x86_64, arm64 |
 | Rocky Linux 9                                            | x86_64, arm64 |
+| Rocky Linux 10                                           | x86_64, arm64 |
 | AlmaLinux 8                                              | x86_64, arm64 |
 | AlmaLinux 9                                              | x86_64, arm64 |
+| AlmaLinux 10                                             | x86_64, arm64 |
 | CentOS 8                                                 | x86_64, arm64 |
 | CentOS 9                                                 | x86_64        |
-| Oracle Enterprise Linux 7                                | x86_64        |
+| CentOS Stream 10                                         | x86_64        |
+| Oracle Enterprise Linux 7                                | x86_64, arm64 |
 | Oracle Enterprise Linux 8                                | x86_64        |
 | Oracle Enterprise Linux 9                                | x86_64        |
+| Oracle Enterprise Linux 10                               | x86_64, arm64 |
 | SUSE Linux Enterprise Server 12                          | x86_64        |
-| SUSE Linux Enterprise Server 15                          | x86_64        |
+| SUSE Linux Enterprise Server 15                          | x86_64, arm64 |
 | Ubuntu 16.04                                             | x86_64        |
 | Ubuntu 18.04                                             | x86_64, arm64 |
 | Ubuntu 20.04                                             | x86_64, arm64 |
@@ -53,6 +58,7 @@ If you have a question checkout the [FAQ](#faq) to see if it has already been an
 | Debian 10                                                | x86_64        |
 | Debian 11                                                | x86_64        |
 | Debian 12                                                | x86_64, arm64 |
+| Debian 13                                                | x86_64        |
 | All Windows Versions supported by the CrowdStrike Sensor | x86_64        |
 
 > [!NOTE]

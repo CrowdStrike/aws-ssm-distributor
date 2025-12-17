@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v2.3.0] - 12-16-2024
+
+### Added
+
+- Support for RHEL 10 (x86_64, arm64)
+- Support for Rocky Linux 10 (x86_64, arm64)
+- Support for Oracle Linux 10 (x86_64, arm64)
+- Support for AlmaLinux 10 (x86_64, arm64)
+- Support for CentOS Stream 10 (x86_64)
+- Support for Debian 13 (x86_64)
+- Support for Oracle Linux 7 (arm64)
+- Support for SLES 15 (arm64)
+
+### Removed
+
+- Support for CentOS 7
+- Support for Oracle Linux 6
+
 ## [v2.2.0] - 06-23-2025
 
 ### Added
