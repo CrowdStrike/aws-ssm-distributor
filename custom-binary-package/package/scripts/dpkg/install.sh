@@ -2,21 +2,32 @@
 #
 # Distributor package installer - Ubuntu based distros
 #
-filename="falcon-sensor.deb"
 
-install() {
-  apt-get install -y libnl-3-200 libnl-genl-3-200
-  export DEBIAN_FRONTEND=noninteractive
-  dpkg -i "$1"
-  echo "/opt/CrowdStrike/falconctl -s -f --cid=$2 $3" 
-  /opt/CrowdStrike/falconctl -s -f --cid="$2" $3
-  systemctl restart falcon-sensor
-  rm $1
-}
-
-if pgrep  -u root falcon-sensor >/dev/null 2>&1 ; then
-  echo "sensor is already running... exiting"
+# Check if service is running and if it is exit 0.
+if pgrep -u root falcon-sensor >/dev/null 2>&1 ; then
+  echo "Falcon Sensor already installed... if you want to update or downgrade, please use Sensor Update Policies in the CrowdStrike console. Please see: https://falcon.crowdstrike.com/documentation/66/sensor-update-policies for more information."
   exit 0
 fi
 
-install $filename $SSM_CID $SSM_LINUX_INSTALLPARAMS
+filename="falcon-sensor.deb"
+
+# Install package
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get -y install "$filename"
+
+# Configure sensor
+echo "/opt/CrowdStrike/falconctl -s -f --cid=$SSM_CID $SSM_LINUX_INSTALLPARAMS"
+/opt/CrowdStrike/falconctl -s -f --cid="$SSM_CID" $SSM_LINUX_INSTALLPARAMS
+
+# Restart service
+systemctl restart falcon-sensor
+
+# Verify service is running
+if pgrep -u root falcon-sensor >/dev/null 2>&1 ; then
+  echo "Falcon Sensor successfully installed and running"
+  exit 0
+else
+  echo "Installation failed. Process falcon-sensor is not running."
+  exit 1
+fi
