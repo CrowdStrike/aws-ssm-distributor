@@ -412,6 +412,10 @@ For more information on each parameter, reference the parameters table in the [D
 </p>
 </details>
 
+## Troubleshooting
+
+See [Troubleshooting](./docs/troubleshooting.md) for guidance on collecting logs from a Distributor package run.
+
 ## FAQ
 
 ### How do I upgrade/downgrade the sensor?
