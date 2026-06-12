@@ -10,15 +10,15 @@ from each run.
 
 There are three ways to retrieve those logs:
 
-- **[Using the AWS CLI](#method-1--using-the-aws-cli)** — pull the logs for a
-  run from your workstation, without connecting to the instance. Best when you
-  have AWS CLI access and the run was within the last ~30 days.
+- **[Using the AWS CLI](#method-1--using-the-aws-cli)** — pull the logs from
+  your workstation without connecting to the instance.
 - **[Using the AWS console](#method-2--using-the-aws-console)** — view the logs
-  in the browser. Best if you prefer the UI over the CLI and the run was within
-  the last ~30 days.
+  in the browser.
 - **[On the instance](#method-3--on-the-instance)** — read the log files
-  directly on the host. Use this if you can't use the CLI or console, or if the
-  run is older than ~30 days or the console/CLI output looks truncated.
+  directly on the host.
+
+The CLI and console methods work for runs within the last ~30 days. For older
+runs, or when their output is truncated, read the logs on the instance.
 
 If you are working with CrowdStrike Support, attach the output from whichever
 method you use to your case.
@@ -30,8 +30,6 @@ method you use to your case.
 >   (`ssm:ListCommands`, `ssm:ListCommandInvocations`).
 > - Distributor runs are **region-specific**. Use the region where the package
 >   was deployed everywhere you see `<REGION>` below.
-> - SSM only keeps command history for about **30 days**. For older runs, use
->   [Method 3](#method-3--on-the-instance).
 
 ### Step 1 — Find the package run
 
@@ -129,7 +127,8 @@ To share with CrowdStrike Support, copy the `configurePackage` **Output** and
 ## Method 3 — On the instance
 
 The complete logs are written on the instance itself, under the orchestration
-folder for the Command ID.
+folder for the Command ID. Use this for runs older than ~30 days, or when the
+CLI or console output is truncated (SSM caps inline output at ~2500 characters).
 
 You'll need the **Command ID** of the run (see [Step 1](#step-1--find-the-package-run),
 or find it in the AWS console under **Systems Manager** > **Run Command** >
