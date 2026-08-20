@@ -5,6 +5,22 @@ variable "ssm_assume_role_arn" {
   type        = string
 }
 
+variable "automation_document_name" {
+  description = "The name of the automation document to create in this region."
+  type        = string
+}
+
+variable "automation_document_content" {
+  description = "The YAML content of the automation document to create in this region."
+  type        = string
+}
+
+variable "excluded_platform_names" {
+  description = "Comma separated platform names to skip. An instance is skipped when the PlatformName reported by SSM contains any of these values (case-insensitive)."
+  type        = string
+  default     = ""
+}
+
 variable "linux_package_version" {
   description = "The version of the CrowdStrike Falcon Sensor package to install on Linux. Example 7.0.4.2333, installs N-1 version if no version is specified."
   type        = string

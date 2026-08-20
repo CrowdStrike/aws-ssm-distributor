@@ -29,6 +29,12 @@ locals {
 
   # regions are the regions we will deploy to, which is the target regions minus the excluded regions
   regions = [for region in local.target_regions : region if !contains(var.exclude_aws_regions, region)]
+
+  # the local copy of the automation document, created in every targeted region
+  automation_document_content = file("${path.module}/documents/CrowdStrike-FalconSensorDeploy.yaml")
+
+  # the document takes a comma separated string, not a list
+  excluded_platform_names = join(",", var.excluded_platform_names)
 }
 
 resource "aws_iam_role" "ssm_assume_role" {
@@ -48,7 +54,7 @@ resource "aws_iam_role" "ssm_assume_role" {
 }
 
 resource "aws_iam_role_policy_attachments_exclusive" "ssm_assume_role" {
-  role_name   = aws_iam_role.ssm_assume_role.name
+  role_name = aws_iam_role.ssm_assume_role.name
   policy_arns = lower(var.secret_storage_method) == "secretsmanager" ? [
     "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole",
     "arn:aws:iam::aws:policy/SecretsManagerReadWrite",
@@ -68,27 +74,30 @@ resource "time_sleep" "ssm_assume_role" {
 module "crowdstrike_distributor_us_east_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"us-east-1") ? 1 : 0
+  count = contains(local.regions, "us-east-1") ? 1 : 0
 
   providers = {
     aws = aws.us_east_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -99,27 +108,30 @@ module "crowdstrike_distributor_us_east_1" {
 module "crowdstrike_distributor_us_east_2" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"us-east-2") ? 1 : 0
+  count = contains(local.regions, "us-east-2") ? 1 : 0
 
   providers = {
     aws = aws.us_east_2
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -130,27 +142,30 @@ module "crowdstrike_distributor_us_east_2" {
 module "crowdstrike_distributor_us_west_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"us-west-1") ? 1 : 0
+  count = contains(local.regions, "us-west-1") ? 1 : 0
 
   providers = {
     aws = aws.us_west_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -161,27 +176,30 @@ module "crowdstrike_distributor_us_west_1" {
 module "crowdstrike_distributor_us_west_2" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"us-west-2") ? 1 : 0
+  count = contains(local.regions, "us-west-2") ? 1 : 0
 
   providers = {
     aws = aws.us_west_2
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -192,27 +210,30 @@ module "crowdstrike_distributor_us_west_2" {
 module "crowdstrike_distributor_af_south_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"af-south-1") ? 1 : 0
+  count = contains(local.regions, "af-south-1") ? 1 : 0
 
   providers = {
     aws = aws.af_south_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -223,27 +244,30 @@ module "crowdstrike_distributor_af_south_1" {
 module "crowdstrike_distributor_ap_east_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"ap-east-1") ? 1 : 0
+  count = contains(local.regions, "ap-east-1") ? 1 : 0
 
   providers = {
     aws = aws.ap_east_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -254,27 +278,30 @@ module "crowdstrike_distributor_ap_east_1" {
 module "crowdstrike_distributor_ap_northeast_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"ap-northeast-1") ? 1 : 0
+  count = contains(local.regions, "ap-northeast-1") ? 1 : 0
 
   providers = {
     aws = aws.ap_northeast_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -285,27 +312,30 @@ module "crowdstrike_distributor_ap_northeast_1" {
 module "crowdstrike_distributor_ap_northeast_2" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"ap-northeast-2") ? 1 : 0
+  count = contains(local.regions, "ap-northeast-2") ? 1 : 0
 
   providers = {
     aws = aws.ap_northeast_2
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -316,27 +346,30 @@ module "crowdstrike_distributor_ap_northeast_2" {
 module "crowdstrike_distributor_ap_south_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"ap-south-1") ? 1 : 0
+  count = contains(local.regions, "ap-south-1") ? 1 : 0
 
   providers = {
     aws = aws.ap_south_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -347,27 +380,30 @@ module "crowdstrike_distributor_ap_south_1" {
 module "crowdstrike_distributor_ap_southeast_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"ap-southeast-1") ? 1 : 0
+  count = contains(local.regions, "ap-southeast-1") ? 1 : 0
 
   providers = {
     aws = aws.ap_southeast_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -378,27 +414,30 @@ module "crowdstrike_distributor_ap_southeast_1" {
 module "crowdstrike_distributor_ap_southeast_2" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"ap-southeast-2") ? 1 : 0
+  count = contains(local.regions, "ap-southeast-2") ? 1 : 0
 
   providers = {
     aws = aws.ap_southeast_2
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -409,27 +448,30 @@ module "crowdstrike_distributor_ap_southeast_2" {
 module "crowdstrike_distributor_ca_central_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"ca-central-1") ? 1 : 0
+  count = contains(local.regions, "ca-central-1") ? 1 : 0
 
   providers = {
     aws = aws.ca_central_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -440,27 +482,30 @@ module "crowdstrike_distributor_ca_central_1" {
 module "crowdstrike_distributor_eu_central_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"eu-central-1") ? 1 : 0
+  count = contains(local.regions, "eu-central-1") ? 1 : 0
 
   providers = {
     aws = aws.eu_central_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -471,27 +516,30 @@ module "crowdstrike_distributor_eu_central_1" {
 module "crowdstrike_distributor_eu_north_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"eu-north-1") ? 1 : 0
+  count = contains(local.regions, "eu-north-1") ? 1 : 0
 
   providers = {
     aws = aws.eu_north_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -502,27 +550,30 @@ module "crowdstrike_distributor_eu_north_1" {
 module "crowdstrike_distributor_eu_south_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"eu-south-1") ? 1 : 0
+  count = contains(local.regions, "eu-south-1") ? 1 : 0
 
   providers = {
     aws = aws.eu_south_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -533,27 +584,30 @@ module "crowdstrike_distributor_eu_south_1" {
 module "crowdstrike_distributor_eu_west_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"eu-west-1") ? 1 : 0
+  count = contains(local.regions, "eu-west-1") ? 1 : 0
 
   providers = {
     aws = aws.eu_west_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -564,27 +618,30 @@ module "crowdstrike_distributor_eu_west_1" {
 module "crowdstrike_distributor_eu_west_2" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"eu-west-2") ? 1 : 0
+  count = contains(local.regions, "eu-west-2") ? 1 : 0
 
   providers = {
     aws = aws.eu_west_2
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -595,27 +652,30 @@ module "crowdstrike_distributor_eu_west_2" {
 module "crowdstrike_distributor_eu_west_3" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"eu-west-3") ? 1 : 0
+  count = contains(local.regions, "eu-west-3") ? 1 : 0
 
   providers = {
     aws = aws.eu_west_3
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -626,27 +686,30 @@ module "crowdstrike_distributor_eu_west_3" {
 module "crowdstrike_distributor_me_south_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"me-south-1") ? 1 : 0
+  count = contains(local.regions, "me-south-1") ? 1 : 0
 
   providers = {
     aws = aws.me_south_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [
@@ -657,27 +720,30 @@ module "crowdstrike_distributor_me_south_1" {
 module "crowdstrike_distributor_sa_east_1" {
   source = "./modules/crowdstrike-distributor"
 
-  count = contains(local.regions,"sa-east-1") ? 1 : 0
+  count = contains(local.regions, "sa-east-1") ? 1 : 0
 
   providers = {
     aws = aws.sa_east_1
   }
 
-  ssm_assume_role_arn = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
-  linux_package_version = var.linux_package_version
-  windows_package_version = var.windows_package_version
-  linux_installer_params = var.linux_installer_params
-  windows_installer_params = var.windows_installer_params
-  cron_schedule_expression = var.cron_schedule_expression
+  ssm_assume_role_arn         = time_sleep.ssm_assume_role.triggers["ssm_assume_role_arn"]
+  automation_document_name    = var.automation_document_name
+  automation_document_content = local.automation_document_content
+  excluded_platform_names     = local.excluded_platform_names
+  linux_package_version       = var.linux_package_version
+  windows_package_version     = var.windows_package_version
+  linux_installer_params      = var.linux_installer_params
+  windows_installer_params    = var.windows_installer_params
+  cron_schedule_expression    = var.cron_schedule_expression
 
-  falcon_client_id = var.falcon_client_id
+  falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
-  falcon_cloud = var.falcon_cloud
+  falcon_cloud         = var.falcon_cloud
 
-  secret_storage_method = var.secret_storage_method
-  secrets_manager_secret_name = var.secrets_manager_secret_name
-  falcon_cloud_ssm_parameter_name = var.falcon_cloud_ssm_parameter_name
-  falcon_client_id_ssm_parameter_name = var.falcon_client_id_ssm_parameter_name
+  secret_storage_method                   = var.secret_storage_method
+  secrets_manager_secret_name             = var.secrets_manager_secret_name
+  falcon_cloud_ssm_parameter_name         = var.falcon_cloud_ssm_parameter_name
+  falcon_client_id_ssm_parameter_name     = var.falcon_client_id_ssm_parameter_name
   falcon_client_secret_ssm_parameter_name = var.falcon_client_secret_ssm_parameter_name
 
   depends_on = [

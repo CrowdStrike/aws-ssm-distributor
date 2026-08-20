@@ -62,10 +62,17 @@ resource "aws_ssm_parameter" "falcon_client_secret" {
   value = var.falcon_client_secret
 }
 
+resource "aws_ssm_document" "sensor_deploy" {
+  name            = var.automation_document_name
+  document_type   = "Automation"
+  document_format = "YAML"
+  content         = var.automation_document_content
+}
+
 resource "aws_ssm_association" "sensor_deploy" {
   association_name = "CrowdStrike-Sensor-Deploy"
 
-  name = "CrowdStrike-FalconSensorDeploy"
+  name = aws_ssm_document.sensor_deploy.name
 
   schedule_expression = var.cron_schedule_expression
 
@@ -87,9 +94,11 @@ resource "aws_ssm_association" "sensor_deploy" {
     LinuxInstallerParams     = var.linux_installer_params
     WindowsPackageVersion    = var.windows_package_version
     WindowsInstallerParams   = var.windows_installer_params
+    ExcludedPlatformNames    = var.excluded_platform_names
   }
 
   depends_on = [
+    aws_ssm_document.sensor_deploy,
     aws_ssm_parameter.falcon_cloud,
     aws_ssm_parameter.falcon_client_id,
     aws_ssm_parameter.falcon_client_secret,
