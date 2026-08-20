@@ -11,12 +11,6 @@ variable "exclude_aws_regions" {
 }
 
 # Automation Document Variables
-variable "automation_document_name" {
-  description = "The name of the automation document created in each targeted region from documents/CrowdStrike-FalconSensorDeploy.yaml. Cannot begin with aws, amazon, or amzn."
-  type        = string
-  default     = "CrowdStrike-FalconSensorDeploy-Local"
-}
-
 variable "excluded_platform_names" {
   description = "Platform names to skip. An instance is skipped when the PlatformName reported by SSM contains any of these values (case-insensitive). Use this for nodes where the sensor is managed outside of the Distributor, such as Bottlerocket nodes running the sensor as a DaemonSet."
   type        = list(string)

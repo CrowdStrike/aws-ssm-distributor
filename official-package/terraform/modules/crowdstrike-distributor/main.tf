@@ -63,10 +63,10 @@ resource "aws_ssm_parameter" "falcon_client_secret" {
 }
 
 resource "aws_ssm_document" "sensor_deploy" {
-  name            = var.automation_document_name
+  name            = "CrowdStrike-FalconSensorDeploy-Local"
   document_type   = "Automation"
   document_format = "YAML"
-  content         = var.automation_document_content
+  content         = file("${path.module}/documents/CrowdStrike-FalconSensorDeploy.yaml")
 }
 
 resource "aws_ssm_association" "sensor_deploy" {

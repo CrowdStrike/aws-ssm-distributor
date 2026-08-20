@@ -5,16 +5,6 @@ variable "ssm_assume_role_arn" {
   type        = string
 }
 
-variable "automation_document_name" {
-  description = "The name of the automation document to create in this region."
-  type        = string
-}
-
-variable "automation_document_content" {
-  description = "The YAML content of the automation document to create in this region."
-  type        = string
-}
-
 variable "excluded_platform_names" {
   description = "Comma separated platform names to skip. An instance is skipped when the PlatformName reported by SSM contains any of these values (case-insensitive)."
   type        = string
